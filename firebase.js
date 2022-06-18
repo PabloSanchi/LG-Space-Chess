@@ -63,17 +63,18 @@
 
 // works!
 import { initializeApp, getApp, getApps } from "firebase/app";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, setPersistence, inMemoryPersistence} from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, setPersistence, inMemoryPersistence } from "firebase/auth";
 import { getFirestore, query, getDocs, collection, where, addDoc, doc } from "firebase/firestore";
 
+
 const firebaseConfig = {
-    apiKey: "AIzaSyDTSU9Xvx6atJYoJF1q7KwWyVaKO7wR0G8",
-    authDomain: "hydrachess-e9dcd.firebaseapp.com",
-    databaseURL: "https://hydrachess-e9dcd-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "hydrachess-e9dcd",
-    storageBucket: "hydrachess-e9dcd.appspot.com",
-    messagingSenderId: "386533733523",
-    appId: "1:386533733523:web:2c3491497d2d4c38d24966"
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
 getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
@@ -99,7 +100,7 @@ const signInWithGoogle = async () => {
                 lqrigip: "",
             });
         }
-    } catch (err) { 
+    } catch (err) {
         console.error(err);
         alert(err.message);
     }
