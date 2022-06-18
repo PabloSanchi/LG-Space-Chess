@@ -26,7 +26,7 @@ function Login() {
 
     return (
 
-        <Center h="100vh" p={8} bg="green.50">
+        <Center h="100vh" p={8} bg="red.150">
             
             <Stack bg="whiteAlpha.900" spacing={2} align={'center'} maxW={'md'} w={'full'} boxShadow="md" p={20}>
                 
@@ -44,10 +44,9 @@ function Login() {
                 
                 <Button w={'full'} colorScheme={'messenger'} leftIcon={<MdLogout />} onClick={handleSignOut} >
                     <Center>
-                        <Text>Logout</Text>
+                        <Text>About</Text>
                     </Center>
                 </Button>
-
 
             </Stack>
 

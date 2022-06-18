@@ -128,9 +128,7 @@ const Header = (props) => {
                 {show ? <CloseIcon w={3} h={8} /> : <HamburgerIcon w={5} h={10} />}
             </Box>
 
-            <Box display={{ base: show ? 'block' : 'none', md: 'block' }}
-                flexBasis={{ base: '100%', md: 'auto' }}
-            >
+            <Box display={{ base: show ? 'block' : 'none', md: 'block' }} flexBasis={{ base: '100%', md: 'auto' }} >
                 <Flex
                     align="center"
                     justify={['center', 'space-between', 'flex-end', 'flex-end']}

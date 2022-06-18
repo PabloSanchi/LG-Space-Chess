@@ -1,26 +1,50 @@
-import React, { useState, useEffect } from 'react'
-import { useDocument } from 'react-firebase-hooks/firestore';
-import { db, doc } from "../firebase";
+import React, { useState, useEffect, componentDidMount } from 'react'
+import { useDocument, useCollection } from 'react-firebase-hooks/firestore';
 import { Chessboard } from "react-chessboard";
 import { TailSpin } from "react-loader-spinner";
 import { Chess } from "chess.js";
 import toast, { Toaster } from 'react-hot-toast';
 import Header from './Header';
+import Footer from './Footer';
 
-import { Box, Button, Center, Stack, Text } from '@chakra-ui/react';
+import { Box, Button, Center, VStack, Text } from '@chakra-ui/react';
+
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth, db, doc } from "../firebase";
+import { collection, query, where, getDocs, updateDoc } from "firebase/firestore";
 
 function DisplayChess() {
 
+    
+    const [user] = useAuthState(auth);
+    
     // responsive adjustments (naive solution, but fast)
     useEffect(() => {
         const size = [window.innerWidth, window.innerHeight]
-        console.log(size);
+        // console.log(size);
         if(size[0] < 600)
             document.body.style.zoom = "60%";
         else
             document.body.style.zoom = "100%";
     }, []);
-    
+
+
+    // get last saved movement
+    useEffect(() =>  {
+        const getArrows = async () => {
+            var val = null;
+            const q = query(collection(db, "users"), where("uid", "==", user.uid));
+            const snap = await getDocs(q);
+            snap.forEach((el) => {
+                val = ( el.data()?.vote ? el.data()?.vote : null);
+            });
+            setArrow(val)
+        }
+
+        getArrows();        
+    }, [arrow]);
+
+
 
     const [arrow, setArrow] = useState(null);
     const [last, setLast] = useState(null)
@@ -33,8 +57,9 @@ function DisplayChess() {
             snapshotListenOptions: { includeMetadataChanges: true },
         }
     );
-
-    function onDrop(sourceSquare, targetSquare) {
+    
+    
+    async function onDrop(sourceSquare, targetSquare) {
         console.log(arrow);
 
         const game = new Chess()
@@ -60,6 +85,17 @@ function DisplayChess() {
         }
         notify('✅ Success: ' + targetSquare);
 
+        // update vote for the user
+        const q = query(collection(db, "users"), where("uid", "==", user.uid));
+        const snap = await getDocs(q);
+        snap.forEach((el) => {
+            updateDoc(doc(collection(db, "users"),el.id), {
+                vote: [sourceSquare, targetSquare],
+            }).catch(() => {
+                notify('❌ Error');
+            });
+        });
+
         setLast([sourceSquare, targetSquare]);
         setArrow([sourceSquare, targetSquare]);
 
@@ -70,7 +106,9 @@ function DisplayChess() {
     return (
         <div>
             <Header />
-            <Center>
+            {/* <Center h={`calc(100vh - ${adjustment}px)`} > */}
+            {/* <VStack h="100%" w="100%"> */}
+            <Center >
                 <Toaster />
                 {error && <strong>Error: {JSON.stringify(error)}</strong>}
                 {loading && <TailSpin type="Puff" color="#808080" height="100%" width="100%" />}
@@ -83,7 +121,12 @@ function DisplayChess() {
                         customArrows={arrow === null ? [] : [arrow]}
                     />
                 }
+                
+                {/* <Footer /> */}
+
             </Center>
+            
+            
         </div>
 
     )
