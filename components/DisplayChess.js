@@ -15,8 +15,17 @@ import { collection, query, where, getDocs, updateDoc } from "firebase/firestore
 
 function DisplayChess() {
 
-    
     const [user] = useAuthState(auth);
+    const [arrow, setArrow] = useState(null);
+
+    const notify = (text) => toast(text);
+
+    const [value, loading, error] = useDocument(
+        doc(db, 'chess', 'ChessBoardStatus'),
+        {
+            snapshotListenOptions: { includeMetadataChanges: true },
+        }
+    );
     
     // responsive adjustments (naive solution, but fast)
     useEffect(() => {
@@ -27,7 +36,6 @@ function DisplayChess() {
         else
             document.body.style.zoom = "100%";
     }, []);
-
 
     // get last saved movement
     useEffect(() =>  {
@@ -44,24 +52,8 @@ function DisplayChess() {
         getArrows();        
     }, [arrow]);
 
-
-
-    const [arrow, setArrow] = useState(null);
-    const [last, setLast] = useState(null)
-
-    const notify = (text) => toast(text);
-
-    const [value, loading, error] = useDocument(
-        doc(db, 'chess', 'ChessBoardStatus'),
-        {
-            snapshotListenOptions: { includeMetadataChanges: true },
-        }
-    );
-    
-    
     async function onDrop(sourceSquare, targetSquare) {
-        console.log(arrow);
-
+        
         const game = new Chess()
         let move = null;
         // console.log(value.data().status + ' w KQkq - 0 1');
@@ -78,9 +70,8 @@ function DisplayChess() {
         // console.log(game.fen().split(' ')[0]);
 
         if (move === null) {
-            console.log('Illegal move');
             notify('❌ Illegal Move: ' + targetSquare);
-            setArrow(last);
+            setArrow(arrow);
             return false; // illegal move
         }
         notify('✅ Success: ' + targetSquare);
@@ -91,15 +82,14 @@ function DisplayChess() {
         snap.forEach((el) => {
             updateDoc(doc(collection(db, "users"),el.id), {
                 vote: [sourceSquare, targetSquare],
+                gameStatus: game.fen().split(' ')[0],
             }).catch(() => {
                 notify('❌ Error');
             });
         });
 
-        setLast([sourceSquare, targetSquare]);
         setArrow([sourceSquare, targetSquare]);
 
-        console.log('Legal');
         return true;
     }
 
