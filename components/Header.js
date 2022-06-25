@@ -1,10 +1,18 @@
 import { useState, useRef } from 'react';
-import { Flex, Box, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, FormControl, FormLabel, Input, ModalFooter, useDisclosure } from '@chakra-ui/react';
+import { Flex, Box, 
+        Text, Modal, 
+        ModalOverlay, ModalContent, 
+        ModalHeader, ModalCloseButton, 
+        ModalBody, FormControl, 
+        FormLabel, Input, 
+        ModalFooter, useDisclosure, 
+        HStack, VStack } from '@chakra-ui/react';
+
 import { CloseIcon, HamburgerIcon } from '@chakra-ui/icons';
 import { Button, ButtonGroup } from '@chakra-ui/react'
 
 import { auth, logout, db } from "../firebase";
-import { collection, query, where, getDocs, set, updateDoc, setDoc, doc } from "firebase/firestore";
+import { collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import Link from "next/link";
@@ -27,7 +35,6 @@ const MenuItem = ({ children, isLast, to = '/', toDo }) => {
         >
             <Link href={to}>{children}</Link>
         </Button>
-
     );
 };
 
@@ -35,10 +42,10 @@ const MenuItem = ({ children, isLast, to = '/', toDo }) => {
 const Header = (props) => {
 
     // we do not use useState so it wont refresh the page (it will quit the modal!)
-    var lqIp = ""; 
+    var lqIp = "";
 
     const router = useRouter();
-    const [user] = useAuthState(auth);
+    const [user, loadingUser] = useAuthState(auth);
     const [show, setShow] = useState(false);
     const toggleMenu = () => setShow(!show);
 
@@ -54,21 +61,27 @@ const Header = (props) => {
     }
 
     const handleSaveIp = async () => {
-        if(!isIPV4Address(lqIp)) {
+        if (!isIPV4Address(lqIp)) {
             notify('❌ Invalid IP Address');
             return;
         }
 
+        while(loadingUser) {} // waiting for auth hook
+        // var el =  await getDoc(doc(collection(db, "users"), user.uid));
+        // val = (el.data()?.vote ? el.data()?.vote : null);
+
+        updateDoc(doc(collection(db, "users"), user.uid), {
+            lqrigip: lqIp,
+        }).then(() => {
+            notify('✅ IP ADDED ');
+        }).catch(() => {
+            notify('❌ Retry');
+        });
+
         const q = query(collection(db, "users"), where("uid", "==", user.uid));
         const snap = await getDocs(q);
         snap.forEach((el) => {
-            updateDoc(doc(collection(db, "users"),el.id), {
-                lqrigip: lqIp,
-            }).then(() => {
-                notify('✅ IP ADDED ');
-            }).catch(() => {
-                notify('❌ Retry');
-            });
+
         });
         onClose();
     }
@@ -88,16 +101,24 @@ const Header = (props) => {
                     <ModalBody pb={6}>
                         <FormControl>
                             <FormLabel>Enter LGRig IP</FormLabel>
-                            <Input ref={initialRef} placeholder='192.168.0.1' onChange={(e) => lqIp = e.target.value} />
+                            <Input placeholder='192.168.0.1' onChange={(e) => lqIp = e.target.value} />
                         </FormControl>
 
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button color="white" backgroundColor='red.700' mr={3} onClick={handleSaveIp}>
-                            Save
-                        </Button>
-                        <Button onClick={onClose}>Cancel</Button>
+                        <VStack>
+                            <HStack>
+                                <Button color="white" bgGradient='linear(to-r, blue.700,blue.700)' mr={3} onClick={handleSaveIp}>
+                                    Save
+                                </Button>
+                                <Button onClick={onClose}>Cancel</Button>
+                            </HStack>
+                            <HStack>
+                                <Button onClick={() => console.log('demo')}>Demo</Button>
+                                <Button onClick={() => console.log('fun')}>ShowFun</Button>
+                            </HStack>
+                        </VStack>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
@@ -107,7 +128,10 @@ const Header = (props) => {
     return (
         <Flex
             color='white'
-            backgroundColor='red.700'
+            // backgroundColor='red.700'
+            bgGradient='linear(to-r, purple.700,blue.700)'
+            
+            // style={{ filter: 'grayscale(80%)' }}
             mb={8}
             p={8}
             as="nav"
@@ -118,7 +142,7 @@ const Header = (props) => {
         >
             <Toaster />
             <Box w="255">
-                <Text fontSize="lg" fontWeight="bold" noOfLines={1}>
+                <Text fontSize="lg" fontWeight="bold" noOfLines={1} onClick={() => router.push('/')}>
                     LG SPACE CHESS
                 </Text>
                 <Text>{user?.email ? user.displayName : JSON.stringify(user)}</Text>
@@ -135,10 +159,50 @@ const Header = (props) => {
                     direction={['column', 'row', 'row', 'row']}
                     pt={[4, 4, 0, 0]}
                 >
-                    <MenuItem todo={() => { }} to="/about">About</MenuItem>
+                    {/* <MenuItem todo={() => { }} to="/about">About</MenuItem>
                     <MenuItem todo={() => { }} to="/findsat">FindSat</MenuItem>
                     <MenuItem toDo={onOpen}>LQRig</MenuItem>
-                    <MenuItem toDo={handleSignOut} isLast>SignOut</MenuItem>
+                    <MenuItem toDo={handleSignOut} isLast>SignOut</MenuItem> */}
+
+                    <Button
+                        color="blue.800"
+                        backgroundColor="white"
+                        width="100%"
+                        mb={{ base: 2, sm: 0 }}
+                        mr={{ base: 0, sm: 3 }}
+                        display="block"
+                        onClick={() => { router.push('/about') }}
+                    >About</Button>
+
+                    <Button
+                        color="blue.800"
+                        backgroundColor="white"
+                        width="100%"
+                        mb={{ base: 2, sm: 0 }}
+                        mr={{ base: 0, sm: 3 }}
+                        display="block"
+                        onClick={() => { router.push('/findsat') }}
+                    >FindSat</Button>
+
+                    <Button
+                        color="blue.800"
+                        backgroundColor="white"
+                        width="100%"
+                        mb={{ base: 2, sm: 0 }}
+                        mr={{ base: 0, sm: 3 }}
+                        display="block"
+                        onClick={onOpen}
+                    >LGRig</Button>
+
+                    <Button
+                        color="blue.800"
+                        backgroundColor="white"
+                        width="100%"
+                        mb={{ base: 0, sm: 0 }}
+                        mr={{ base: 0, sm: 0 }}
+                        display="block"
+                        onClick={handleSignOut}
+                    >SignOut</Button>
 
                 </Flex>
             </Box>
