@@ -18,32 +18,29 @@ function DisplayChess() {
 
     const [user, loadingUser] = useAuthState(auth);
     const [arrow, setArrow] = useState(null);
-
-    const notify = (text) => toast(text);
-
+    const [isMobile] = useMediaQuery('(max-width: 560px)');
+    const [dimensions, setDimensions] = useState({
+        height: window.innerHeight,
+        width: window.innerWidth
+    })
     const [value, loading, error] = useDocument(
         doc(db, 'chess', 'ChessBoardStatus'),
         {
             snapshotListenOptions: { includeMetadataChanges: true },
         }
     );
+    const [ipTarget, loadingIp, errorIp] = useDocument(
+        doc(db, 'users', user.uid), 
+        {
+            snapshotListenOptions: { includeMetadataChanges: true },
+        }
+    );
 
-    // useEffect(() => {
-    //     console.log('adjusting...')
-    //     const size = [window.innerWidth, window.innerHeight]
-    //     if (size[0] < 340)    
-    //         setChessWidth(320);
-    //     // document.body.style.zoom = "60%";
-    //     else if(size[0] < 600)
-    //         setChessWidth(350)
-    //     else
-    //         setChessWidth(560)
-    //     // document.body.style.zoom = "100%";
-    // },[]);
+    const notify = (text) => toast(text);
 
-    // responsive adjustments (naive solution, but fast)
+    
+    // fetch arrows (last user vote)
     useEffect(() => {
-        // console.log({ base: true ? 50 : 2, sm: 0 });
         console.log('loading arrows...');
         const getArrows = async () => {
             var val = null;
@@ -56,27 +53,26 @@ function DisplayChess() {
                 setArrow(val)
             } catch (err) { }
         }
-
         getArrows();
     }, []);
 
-
+    // onDrop chessboard modification
+    // we give some extra functions
+    //  - add move validation
+    //  - save move in the database
     async function onDrop(sourceSquare, targetSquare) {
 
-        const game = new Chess()
+        const game = new Chess() // create empty game
         let move = null;
-        // console.log(value.data().status + ' w KQkq - 0 1');
-        game.load(value.data().status + ' w - - 0 1');
-        // console.log(game.fen());
+        game.load(value.data().status + ' w - - 0 1'); // load current game status
 
+        // make the move
+        // return null if move is not allowed
         move = game.move({
             from: sourceSquare,
             to: targetSquare,
-            promotion: "q",
+            // promotion: "q", // promote to queen (not used yet)
         });
-
-        // console.log(sourceSquare, targetSquare);
-        // console.log(game.fen().split(' ')[0]);
 
         if (move === null) {
             notify('❌ Illegal Move: ' + targetSquare);
@@ -118,14 +114,8 @@ function DisplayChess() {
         return true;
     }
 
-    const [isMobile] = useMediaQuery('(max-width: 560px)');
-
-    const [dimensions, setDimensions] = useState({
-        height: window.innerHeight,
-        width: window.innerWidth
-    })
-
-    // screen.orientation.lock('portrait');
+    // responsive (useLayout is not asynchronous, is synchronous) 
+    // we use it so we wont have any misplaced components.
     useLayoutEffect(() => {
         function handleResize() {
             setTimeout(() => {
@@ -133,7 +123,7 @@ function DisplayChess() {
                     height: window.innerHeight,
                     width: window.innerWidth
                 })
-            },100);
+            },20);
         }
 
         window.addEventListener('resize', handleResize)
@@ -143,7 +133,7 @@ function DisplayChess() {
     })
 
     return (
-        <VStack >
+        <VStack h="100vh">
             <Header />
             <Flex direction="column">
                 <Toaster />
@@ -151,9 +141,10 @@ function DisplayChess() {
                 {loading && <TailSpin type="Puff" color="#808080" height="100%" width="100%" />}
                 {isMobile && <Text color="blue">Mobile</Text>}
                 {!isMobile && <Text color="red">Not Mobile</Text>}
-                {value &&
+                {ipTarget && <Text color="green"> Liquid Galaxy Master IP: {ipTarget.data().lqrigip}</Text>}
+                {ipTarget && value &&
                     <Chessboard
-                        boardWidth={isMobile ? (dimensions.width - 20 > 425 ? 350 : dimensions.width - 20) : 560}
+                        boardWidth={isMobile ? (dimensions.width - 20 > 560 ? 350 : dimensions.width - 20) : 560}
                         position={value.data().status}
                         onPieceDrop={onDrop}
                         customDropSquareStyle={{ boxShadow: 'inset 0 0 1px 6px rgba(255,200,100,0.75)' }}
@@ -162,8 +153,9 @@ function DisplayChess() {
                         customBoardStyle={{ borderRadius: '10px', boxShadow: '0 5px 15px rgba(0, 0, 0, 0.5 ' }}
                     />
                 }
+                
             </Flex>
-            {/* <Footer w="100vw"/> */}
+            <Footer position="fixed" b={0} w="100vw"/>
         </VStack>
     )
 }
