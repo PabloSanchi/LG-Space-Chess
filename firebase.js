@@ -1,17 +1,21 @@
 import { initializeApp, getApp, getApps } from "firebase/app";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, setPersistence, inMemoryPersistence } from "firebase/auth";
 import { getFirestore, query, getDocs, collection, where, addDoc, doc, setDoc } from "firebase/firestore";
-
+import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+    databaseUrl: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
     storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
     messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
+// https://hydrachess-e9dcd-default-rtdb.europe-west1.firebasedatabase.app
+// https://hydrachess-e9dcd-default-rtdb.europe-west1.firebasedatabase.app
+
+
 
 // const firebaseConfig = {
 //     apiKey: "AIzaSyDE9Wb4gUJXiY9lE94X6qY2zX2CE79LoCU",
@@ -26,6 +30,7 @@ getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 const db = getFirestore();
 const auth = getAuth();
+const rtdb = getDatabase();
 // const provider = new GoogleAuthProvider();
 
 const googleProvider = new GoogleAuthProvider();
@@ -64,4 +69,4 @@ const logout = () => {
 };
 
 // export { db, auth, provider, signInWithPopup };
-export { auth, db, signInWithGoogle, logout, collection, doc };
+export { auth, db, signInWithGoogle, logout, collection, doc, rtdb };

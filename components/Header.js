@@ -142,7 +142,11 @@ const Header = (props) => {
         >
             <Toaster />
             <Box w="255">
-                <Text fontSize="lg" fontWeight="bold" noOfLines={1} onClick={() => router.push('/')}>
+                <Text fontSize="lg" fontWeight="bold" noOfLines={1} onClick={() => router.push('/')}
+                    _hover={{
+                        cursor: "pointer",
+                    }}
+                >
                     LG SPACE CHESS
                 </Text>
                 <Text>{user?.email ? user.displayName : JSON.stringify(user)}</Text>
