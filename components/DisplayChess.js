@@ -108,7 +108,6 @@ function DisplayChess() {
     const handleDisconnect = async() => {
         console.log(soc);
         soc.disconnect();
-        // socket.disconnect();
         setConStat('Disconnected');
     }
 
