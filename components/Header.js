@@ -9,34 +9,14 @@ import { Flex, Box,
         HStack, VStack } from '@chakra-ui/react';
 
 import { CloseIcon, HamburgerIcon } from '@chakra-ui/icons';
-import { Button, ButtonGroup } from '@chakra-ui/react'
-
-import { auth, logout, db } from "../firebase";
-import { collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
-
-import { useAuthState } from 'react-firebase-hooks/auth';
-import Link from "next/link";
-import { useRouter } from 'next/router';
-
+import { Button } from '@chakra-ui/react'
 import toast, { Toaster } from 'react-hot-toast';
+import { auth, logout, db } from "../firebase";
+import { collection, updateDoc, doc } from "firebase/firestore";
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { useRouter } from 'next/router';
 import { isIPV4Address } from "ip-address-validator";
-
-const MenuItem = ({ children, isLast, to = '/', toDo }) => {
-
-    return (
-        <Button
-            color="red.800"
-            backgroundColor="white"
-            width="100%"
-            mb={{ base: isLast ? 0 : 2, sm: 0 }}
-            mr={{ base: 0, sm: isLast ? 0 : 3 }}
-            display="block"
-            onClick={toDo}
-        >
-            <Link href={to}>{children}</Link>
-        </Button>
-    );
-};
+import Link from "next/link"; 
 
 
 const Header = (props) => {
@@ -67,8 +47,6 @@ const Header = (props) => {
         }
 
         while(loadingUser) {} // waiting for auth hook
-        // var el =  await getDoc(doc(collection(db, "users"), user.uid));
-        // val = (el.data()?.vote ? el.data()?.vote : null);
 
         updateDoc(doc(collection(db, "users"), user.uid), {
             lqrigip: lqIp,
@@ -78,11 +56,6 @@ const Header = (props) => {
             notify('❌ Retry');
         });
 
-        const q = query(collection(db, "users"), where("uid", "==", user.uid));
-        const snap = await getDocs(q);
-        snap.forEach((el) => {
-
-        });
         onClose();
     }
 
@@ -130,8 +103,6 @@ const Header = (props) => {
             color='white'
             // backgroundColor='red.700'
             bgGradient='linear(to-r, purple.700,blue.700)'
-            
-            // style={{ filter: 'grayscale(80%)' }}
             mb={8}
             p={8}
             as="nav"
@@ -214,8 +185,25 @@ const Header = (props) => {
             <GetModal />
         </Flex>
     );
-
 };
+
+const MenuItem = ({ children, isLast, to = '/', toDo }) => {
+
+    return (
+        <Button
+            color="red.800"
+            backgroundColor="white"
+            width="100%"
+            mb={{ base: isLast ? 0 : 2, sm: 0 }}
+            mr={{ base: 0, sm: isLast ? 0 : 3 }}
+            display="block"
+            onClick={toDo}
+        >
+            <Link href={to}>{children}</Link>
+        </Button>
+    );
+};
+
 
 export default Header;
 

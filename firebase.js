@@ -12,10 +12,6 @@ const firebaseConfig = {
     messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
-// https://hydrachess-e9dcd-default-rtdb.europe-west1.firebasedatabase.app
-// https://hydrachess-e9dcd-default-rtdb.europe-west1.firebasedatabase.app
-
-
 
 // const firebaseConfig = {
 //     apiKey: "AIzaSyDE9Wb4gUJXiY9lE94X6qY2zX2CE79LoCU",
@@ -42,21 +38,14 @@ const signInWithGoogle = async () => {
         const q = query(collection(db, "users"), where("uid", "==", user.uid));
         const docs = await getDocs(q);
         if (docs.docs.length === 0) {
-
             await setDoc(doc(db,"users",user.uid), {
                 uid: user.uid,
                 name: user.displayName,
                 authProvider: "google",
                 email: user.email,
                 lqrigip: "",
+                limit: 3,
             });
-            // await addDoc(collection(db, "users"), {
-            //     uid: user.uid,
-            //     name: user.displayName,
-            //     authProvider: "google",
-            //     email: user.email,
-            //     lqrigip: "",
-            // });
         }
     } catch (err) {
         console.error(err);

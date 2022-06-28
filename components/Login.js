@@ -115,7 +115,7 @@ export default function Login() {
     }
 
     return (
-        <Box position={'relative'}>
+        <Box p={5} position={'relative'}>
             <Container
                 as={SimpleGrid}
                 maxW={'7xl'}
@@ -144,7 +144,7 @@ export default function Login() {
                                     key={avatar.name}
                                     name={avatar.name}
                                     src={avatar.url}
-                                    size={useBreakpointValue({ base: 'md', md: 'lg' })}
+                                    size={({ base: 'md', md: 'lg' })}
                                     position={'relative'}
                                     zIndex={2}
                                     _before={{

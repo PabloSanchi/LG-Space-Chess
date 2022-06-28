@@ -1,31 +1,13 @@
-import React, { useEffect } from 'react'
-import { signInWithGoogle, auth, logout } from "../firebase";
-import { useAuthState } from 'react-firebase-hooks/auth';
-
-
-import { FcGoogle } from 'react-icons/fc';
-import { Box, Button, Center, VStack, Text } from '@chakra-ui/react';
-import { MdLogout } from 'react-icons/md';
+import React from 'react'
+import { VStack, Text, Grid } from '@chakra-ui/react';
 import Head from 'next/head'
-import Carousel from '../components/Carousel';
 import Header from '../components/Header';
-
 import Image from 'next/image';
 import LQlogo from '../public/logoLg.png';
 import FirebaseIcon from '../public/firebaseLogo.png';
-import GoogleIcon from '../public/google_icon.png';
 import Gsoc from '../public/logoGsoc.png';
-import logoLg from '../public/logoLg.png';
-
-import { Grid, GridItem } from '@chakra-ui/react'
 
 function about() {
-
-    useEffect(() => {
-        document.body.style.zoom = "100%";
-    }, []);
-
-
     return (
         <div>
             <Head>
@@ -33,14 +15,16 @@ function about() {
                 <meta name="description" content="" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
+            
             <Header />
 
             <VStack>
-                <Text p={10} >A Newspace related visualization project in collaboration with Hydra-Space.
+                <Text p={10} >
+                    A Newspace related visualization project in collaboration with Hydra-Space.
                     The basic idea is to use the Liquid Galaxy cluster as a handler and visualizer of a world chess game
-                    that will happen with people around the world and through satellite communications, a world's first !!!
+                    that will happen with people around the world and through satellite communications, a world&apos;s first !!!
                 </Text>
-                <Grid p={10} templateColumns='repeat(2, 0.45fr)' gap={2}>
+                <Grid p={10} templateColumns="repeat(2, 0.45fr)" gap={2}>
                     <Image  src={LQlogo}></Image>
                     <Image src={Gsoc}></Image>
                 </Grid>
