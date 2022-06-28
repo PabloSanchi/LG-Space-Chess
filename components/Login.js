@@ -58,7 +58,7 @@
 import React, { useEffect } from 'react'
 import { signInWithGoogle, auth, logout } from "../firebase";
 import { useAuthState } from 'react-firebase-hooks/auth';
-
+import Image from 'next/image';
 
 import { FcGoogle, AiOutlineTwitter } from 'react-icons/fc';
 import {
@@ -78,21 +78,21 @@ import {
     Center,
 } from '@chakra-ui/react';
 
+// import Spl from '../public/SPC.svg';
+import Spl from '../public/Spl.png';
+
 const avatars = [
     {
         name: 'a',
         url: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGxhbmV8ZW58MHx8MHx8&w=1000&q=80',
-        
     },
     {
         name: 'b',
         url: 'https://images.unsplash.com/photo-1528154291023-a6525fabe5b4?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTV8fGJvYXR8ZW58MHx8MHx8&w=1000&q=80',
-        
     },
     {
         name: 'c',
         url: 'https://i.pinimg.com/originals/42/63/2f/42632f4d48030c4b04bdeb2bbe00e313.jpg'
-        
     },
     {
         name: 'd',
@@ -105,10 +105,6 @@ const avatars = [
 ];
 
 export default function Login() {
-
-    useEffect(() => {
-        document.body.style.zoom = "100%";
-    }, []);
 
     const handleLogin = () => {
         signInWithGoogle()
@@ -126,18 +122,18 @@ export default function Login() {
                     <Heading
                         lineHeight={1.1}
                         fontSize={{ base: '3xl', sm: '4xl', md: '5xl', lg: '6xl' }}>
-                        LG SPACE CHESS<br/>
+                        LG SPACE CHESS<br />
                         <Text
                             as={'span'}
-                            bgGradient="linear(to-r, red.700,pink.800)"
+                            bgGradient="linear(to-r, #CD853F,pink.800)"
                             bgClip="text"
                             fontSize="20px"
-                            >
+                        >
                             Liquid Galaxy & Hydra-Space
                         </Text>{' '}
-                        
+
                     </Heading>
-                    <Stack direction={'row'} spacing={4} align={'center'}>
+                    {/* <Stack direction={'row'} spacing={4} align={'center'}>
                         <AvatarGroup>
                             {avatars.map((avatar) => (
                                 <Avatar
@@ -190,7 +186,8 @@ export default function Login() {
                             }}>
                             YOU
                         </Flex>
-                    </Stack>
+                    </Stack> */}
+                    <Image  viewBox="5 0 100 100" src={Spl} ></Image>
                 </Stack>
                 <Stack
                     bg={'gray.50'}
@@ -218,16 +215,17 @@ export default function Login() {
                     </Stack>
                     <Box as={'form'} mt={10}>
                         <Stack spacing={4}>
-                            <Button 
-                                w={'full'} 
+                            <Button
+                                w={'full'}
                                 variant={'outline'}
-                                leftIcon={<FcGoogle />} 
+                                leftIcon={<FcGoogle />}
                                 onClick={handleLogin}
                                 color='white'
-                                bgGradient="linear(to-r, purple.600,red.600)"
+                                bgColor={'#CD853F'}
+                                // bgGradient="linear(to-r, purple.600,red.600)"
                                 _hover={{
                                     color: 'white',
-                                    bgGradient: 'linear(to-r, purple.500, red.500)',
+                                    bgGradient: 'linear(to-r, #CD853F, #FF8C00)',
                                     boxShadow: 'xl',
                                 }}>
                                 <Center>
@@ -236,7 +234,6 @@ export default function Login() {
                             </Button>
                         </Stack>
                     </Box>
-                    
                 </Stack>
             </Container>
             <Blur
@@ -260,9 +257,9 @@ export const Blur = (props) => {
             xmlns="http://www.w3.org/2000/svg"
             {...props}>
             {/* <circle cx="71" cy="61" r="111" fill="#FFFF65" /> */}
-            <circle cx="71" cy="61" r="111" fill="gray" />
+            {/* <circle cx="71" cy="61" r="111" fill="gray" />
             <circle cx="244" cy="16" r="120" fill="gray" />
-            <circle cx="80.5" cy="291" r="60" fill="gray" />
+            <circle cx="80.5" cy="291" r="60" fill="gray" /> */}
             {/* <circle cy="291" r="139" fill="#ED64A6" />
             <circle cx="80.5" cy="189.5" r="101.5" fill="#ED8936" />
             <circle cx="196.5" cy="317.5" r="101.5" fill="#ECC94B" />

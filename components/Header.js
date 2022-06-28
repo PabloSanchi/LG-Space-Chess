@@ -82,7 +82,7 @@ const Header = (props) => {
                     <ModalFooter>
                         <VStack>
                             <HStack>
-                                <Button color="white" bgGradient='linear(to-r, blue.700,blue.700)' mr={3} onClick={handleSaveIp}>
+                                <Button color="white" backgroundColor="#CD853F" mr={3} onClick={handleSaveIp}>
                                     Save
                                 </Button>
                                 <Button onClick={onClose}>Cancel</Button>
@@ -102,7 +102,8 @@ const Header = (props) => {
         <Flex
             color='white'
             // backgroundColor='red.700'
-            bgGradient='linear(to-r, purple.700,blue.700)'
+            // bgGradient='linear(to-r, purple.700,blue.700)'
+            bgGradient='linear(to-r, #CD853F, #DAA520)'
             mb={8}
             p={8}
             as="nav"
@@ -140,7 +141,7 @@ const Header = (props) => {
                     <MenuItem toDo={handleSignOut} isLast>SignOut</MenuItem> */}
 
                     <Button
-                        color="blue.800"
+                        color="orange.800"
                         backgroundColor="white"
                         width="100%"
                         mb={{ base: 2, sm: 0 }}
@@ -150,7 +151,7 @@ const Header = (props) => {
                     >About</Button>
 
                     <Button
-                        color="blue.800"
+                        color="orange.800"
                         backgroundColor="white"
                         width="100%"
                         mb={{ base: 2, sm: 0 }}
@@ -160,7 +161,7 @@ const Header = (props) => {
                     >FindSat</Button>
 
                     <Button
-                        color="blue.800"
+                        color="orange.800"
                         backgroundColor="white"
                         width="100%"
                         mb={{ base: 2, sm: 0 }}
@@ -170,7 +171,7 @@ const Header = (props) => {
                     >LGRig</Button>
 
                     <Button
-                        color="blue.800"
+                        color="orange.800"
                         backgroundColor="white"
                         width="100%"
                         mb={{ base: 0, sm: 0 }}

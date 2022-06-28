@@ -6,7 +6,7 @@ import { Chess } from "chess.js";
 import toast, { Toaster } from 'react-hot-toast';
 import Header from './Header';
 import { useMediaQuery } from '@chakra-ui/react'
-import { Button, Text, Flex, VStack, Tag, Badge } from '@chakra-ui/react';
+import { Container, Stack, Box, HStack, Button, Text, Flex, VStack, Tag, Badge } from '@chakra-ui/react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db, doc } from "../firebase";
 import { collection, updateDoc, setDoc, getDoc } from "firebase/firestore";
@@ -15,7 +15,7 @@ import { useRouter } from 'next/router'
 
 function DisplayChess() {
 
-    var socket;
+    
     const router = useRouter();
     const [conStat, setConStat] = useState('Disconnected');
     const [user, loadingUser] = useAuthState(auth); // user
@@ -41,6 +41,7 @@ function DisplayChess() {
         }
     );
 
+    
     // notifications
     const notify = (text) => toast(text);
 
@@ -64,33 +65,51 @@ function DisplayChess() {
         getArrows();
     }, []);
 
+    const [soc, setSoc] = useState('ndad');
+    let socket = 'hola';
     /*
     handleConnect -> connect client with lgrig via WebSockets
     */
-    const handleConnect = () => {
+    const handleConnect = async () => {
         console.log('IP: ' + userDoc.data()?.lqrigip);
+        setConStat('Loading...');
         try {
-            socket = io(`http://${userDoc.data()?.lqrigip}:3001`, {
+            socket = await io(`http://${userDoc.data()?.lqrigip}:3001`, {
                 'reconnect': false,
                 'connect_timeout': 1000,
             });
+
+            console.log(socket);
+
+            setSoc(socket);
 
             socket.on("connect", () => {
                 console.log('Cliente Conectado');
                 console.log(socket.id); // x8WIv7-mJelg7on_ALbx
                 setConStat('Connected');
             });
-
+        
             socket.on("connect_error", (err) => {
                 console.log(`connect_error due to ${err.message}`);
                 socket.disconnect();
                 setConStat('Fail');
             });
-
+        
+            socket.on('leave-session', () => {
+                socket.disconnect();
+            })
+            
         } catch (err) {
             notify('⚠️ Fatal Error: Refreshing');
             router.reload(window.location.pathname)
         }
+    }
+
+    const handleDisconnect = async() => {
+        console.log(soc);
+        soc.disconnect();
+        // socket.disconnect();
+        setConStat('Disconnected');
     }
 
 
@@ -200,13 +219,23 @@ function DisplayChess() {
     })
 
     return (
-        <VStack h="calc(100vh)" w="100vw" position="absolute">
+        <VStack h="calc(100vh-3.5rem)" w="100vw" position="absolute">
             <Header />
             <Flex direction="column">
                 <Toaster />
                 {error && <strong>Error: {JSON.stringify(error)}</strong>}
                 {loading && <TailSpin type="Puff" color="#808080" height="100%" width="100%" />}
-                {userDoc && <Tag m={1} w={150} variant='solid' colorScheme='teal' >Remaing attempts: {userDoc.data()?.limit}</Tag>}
+
+                {userDoc && value &&
+                    <HStack>
+                        <Tag m={1} w={155} variant='solid' colorScheme='teal' >Remaing attempts: {userDoc.data()?.limit}</Tag>
+                        <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={handleConnect}>Connect</Button>
+                        {conStat == 'Connected' &&
+                            <Button mt={10} m={1} w={20} size='sm' colorScheme='red' onClick={handleDisconnect}>Quit</Button>
+                        }
+                    </HStack>
+                }
+
                 {userDoc && <Badge m={1} colorScheme='purple'> LGRig IP: {userDoc.data()?.lqrigip}</Badge>}
                 {value && <Badge m={1} colorScheme={value.data().turn == 'w' ? "blue" : "yellow"}>
                     Turn: {value.data().turn == 'w' ? "Earth" : "Space"}</Badge>}
@@ -221,21 +250,31 @@ function DisplayChess() {
                         customBoardStyle={{ borderRadius: '10px', boxShadow: '0 5px 15px rgba(0, 0, 0, 0.5 ' }}
                     />
                 }
-                {userDoc && value && <Button m={1} w={20} size='sm' colorScheme='blue' onClick={handleConnect}>Connect</Button>}
-                {userDoc && value && <Text>Connection Status: { conStat.toString() }</Text>}
-                <Text m={10}></Text>
+
+                <Text m={1}></Text>
+                {/* {userDoc && value && <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={handleConnect}>Connect</Button>} */}
+
+                {userDoc && value &&
+                    <Text >Connection Status: {conStat}
+                        <Button backgroundColor='white' m={1} w={3} h={3} isLoading={(conStat == 'Loading...')}>
+                        </Button>
+                    </Text>
+                }
+
+                <Text m={1}></Text>
+
             </Flex>
 
             {/* <Footer position="absolute" w="100%" height="2.5rem" bottom={0}/> */}
             {/* <Box
                 // screen.orientation.type
                 mt={10}
-                position="fixed"
+                position="relative"
                 w="100%"
-                height="3rem"
+                height="3.5rem"
                 bottom={0}
-                bg={useColorModeValue('black', 'red.900')}
-                color={useColorModeValue('white', 'gray.200')}>
+                bg='black'
+                color='white'>
                 <Container
                     as={Stack}
                     maxW={'6xl'}
