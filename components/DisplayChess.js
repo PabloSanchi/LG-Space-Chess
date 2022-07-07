@@ -65,8 +65,8 @@ function DisplayChess() {
         getArrows();
     }, []);
 
-    const [soc, setSoc] = useState('ndad');
-    let socket = 'hola';
+    const [socket, setSocket] = useState(null);
+    let soc = 'null';
     /*
     handleConnect -> connect client with lgrig via WebSockets
     */
@@ -74,31 +74,29 @@ function DisplayChess() {
         console.log('IP: ' + userDoc.data()?.lqrigip);
         setConStat('Loading...');
         try {
-            socket = await io(`http://${userDoc.data()?.lqrigip}:3001`, {
+            soc = await io(`http://${userDoc.data()?.lqrigip}:8120`, {
                 'reconnect': false,
                 'connect_timeout': 1000,
+                query: "mobile=true"
             });
 
-            console.log(socket);
+            setSocket(soc);
 
-            setSoc(socket);
-
-            socket.on("connect", () => {
+            soc.on("connect", () => {
                 console.log('Cliente Conectado');
-                console.log(socket.id); // x8WIv7-mJelg7on_ALbx
+                console.log(soc.id); // x8WIv7-mJelg7on_ALbx
                 setConStat('Connected');
+                soc.emit('currentBoard', {
+                    status: value.data().status
+                });
             });
         
-            socket.on("connect_error", (err) => {
+            soc.on("connect_error", (err) => {
                 console.log(`connect_error due to ${err.message}`);
-                socket.disconnect();
+                soc.disconnect();
                 setConStat('Fail');
             });
-        
-            socket.on('leave-session', () => {
-                socket.disconnect();
-            })
-            
+          
         } catch (err) {
             notify('⚠️ Fatal Error: Refreshing');
             router.reload(window.location.pathname)
@@ -106,11 +104,12 @@ function DisplayChess() {
     }
 
     const handleDisconnect = async() => {
-        console.log(soc);
-        soc.disconnect();
-        setConStat('Disconnected');
+        if (socket) { 
+            socket.emit('quit');
+            socket.disconnect();
+            setConStat('Disconnected');
+        }
     }
-
 
     // onDrop modification
     // we give some extra functions
@@ -152,6 +151,15 @@ function DisplayChess() {
             setArrow(arrow);
             return false;
         }
+
+        // send fen status to the rig (if connected):
+        if(socket) {
+            socket.emit('newStatus', {
+                status: game.fen().split(' ')[0], 
+                move: (sourceSquare + ' ' + targetSquare)
+            });
+        }
+
 
         // legal move
         notify('✅ Success: ' + targetSquare);
@@ -227,7 +235,7 @@ function DisplayChess() {
 
                 {userDoc && value &&
                     <HStack>
-                        <Tag m={1} w={155} variant='solid' colorScheme='teal' >Remaing attempts: {userDoc.data()?.limit}</Tag>
+                        <Tag m={1} w={100} variant='solid' colorScheme='teal' >Attempts: {userDoc.data()?.limit}</Tag>
                         <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={handleConnect}>Connect</Button>
                         {conStat == 'Connected' &&
                             <Button mt={10} m={1} w={20} size='sm' colorScheme='red' onClick={handleDisconnect}>Quit</Button>
