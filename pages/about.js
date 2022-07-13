@@ -22,7 +22,7 @@ function about() {
             <VStack >
                 {/* <Image src={Spc} width="2000" height="2000" /> */}
                 {/* <Text maxW={'6xl'} fontSize={30} >Liquid Galaxy Space Chess</Text> */}
-                <Image w={45} h={20} src={Spl}></Image>
+                <Image w={45} h={20} src={Spl} alt="main logo"></Image>
                 <Text maxW={'6xl'} p={5} >
                     A Newspace related visualization project in collaboration with Hydra-Space.
                     The basic idea is to use the Liquid Galaxy cluster as a handler and visualizer of a world chess game
@@ -39,8 +39,8 @@ function about() {
 
                 {/* templateColumns="repeat(2, 0.5fr)" gap={2} */}
                 <HStack maxW={'lg'} p={10} >
-                    <Image p={20} src={LQlogo}></Image>
-                    <Image p={20} src={Gsoc}></Image>
+                    <Image p={20} src={LQlogo} alt="lq logo"></Image>
+                    <Image p={20} src={Gsoc} alt="main gsoc"></Image>
                 </HStack>
 
             </VStack>

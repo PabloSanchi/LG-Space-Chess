@@ -6,7 +6,7 @@ import { Chess } from "chess.js";
 import toast, { Toaster } from 'react-hot-toast';
 import Header from './Header';
 import { useMediaQuery } from '@chakra-ui/react'
-import { Container, Stack, Box, HStack, Button, Text, Flex, VStack, Tag, Badge } from '@chakra-ui/react';
+import { Stack, Box, HStack, Button, Text, Flex, VStack, Tag, Badge } from '@chakra-ui/react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db, doc } from "../firebase";
 import { collection, updateDoc, setDoc, getDoc } from "firebase/firestore";
@@ -15,8 +15,10 @@ import { useRouter } from 'next/router'
 
 function DisplayChess() {
 
-    
+    // variable definition
+    let soc = 'null';
     const router = useRouter();
+    const [socket, setSocket] = useState(null);
     const [conStat, setConStat] = useState('Disconnected');
     const [user, loadingUser] = useAuthState(auth); // user
     const [arrow, setArrow] = useState(null); // chessboard arrow
@@ -33,6 +35,7 @@ function DisplayChess() {
             snapshotListenOptions: { includeMetadataChanges: true },
         }
     );
+
     // fetch the user doc (uid, displayName, lgrigip, vote limit, ...)
     const [userDoc, loadingUserDoc, errorUserDoc] = useDocument(
         doc(db, 'users', user.uid),
@@ -40,11 +43,9 @@ function DisplayChess() {
             snapshotListenOptions: { includeMetadataChanges: true },
         }
     );
-
     
     // notifications
     const notify = (text) => toast(text);
-
 
     // fetch arrows (last user vote)
     useEffect(() => {
@@ -63,10 +64,20 @@ function DisplayChess() {
 
         }
         getArrows();
-    }, []);
+    }, [loadingUser, user.uid]);
 
-    const [socket, setSocket] = useState(null);
-    let soc = 'null';
+    /*
+    handle black pieces move when value().data.status changes
+    */
+    useEffect(() => {
+        if (socket) { 
+            socket.emit('newStatus', {
+                status: value?.data()?.status,
+                move: ''
+            });
+        }
+    }, [value?.data()?.status]);
+
     /*
     handleConnect -> connect client with lgrig via WebSockets
     */
@@ -84,7 +95,7 @@ function DisplayChess() {
 
             soc.on("connect", () => {
                 console.log('Cliente Conectado');
-                console.log(soc.id); // x8WIv7-mJelg7on_ALbx
+                console.log(soc.id);
                 setConStat('Connected');
                 soc.emit('currentBoard', {
                     status: value.data().status
@@ -111,10 +122,39 @@ function DisplayChess() {
         }
     }
 
-    // onDrop modification
-    // we give some extra functions
-    //  - add move validation
-    //  - save move in the database
+    /*
+    sendInstruction -> send instruction to lgrig via WebSockets
+    instruction: 
+        - showDemo (demo of game chess)
+        - showChess (show chessboard)
+        - showEarth (show earth illustration)
+    */
+    const sendInstruction = (instruction) => {
+        if (socket) {
+            console.log('emmiting: ' + instruction);
+            socket.emit(instruction);
+        }
+    }
+
+    /*
+    sendMove -> set new camera offset to lgrig via WebSockets
+        - only depth and axis control
+    */
+    const sendMove = (xVal, zVal) => {
+        if (socket) {
+            socket.emit('controllerMove', {
+                x: xVal,
+                z: zVal,
+            });
+        }
+    }
+
+    /* 
+    onDrop modification
+        we give some extra functions:
+            - add move validation
+            - save move in the database
+    */
     async function onDrop(sourceSquare, targetSquare) {
 
         if (value.data().turn == 'b') {
@@ -155,7 +195,7 @@ function DisplayChess() {
         // send fen status to the rig (if connected):
         if(socket) {
             socket.emit('newStatus', {
-                status: game.fen().split(' ')[0], 
+                status: value.data().status, // game.fen().split(' ')[0], 
                 move: (sourceSquare + ' ' + targetSquare)
             });
         }
@@ -203,8 +243,10 @@ function DisplayChess() {
         return true;
     }
 
-    // responsive (useLayout is not asynchronous, is synchronous) 
-    // we use it so we wont have any misplaced components.
+    /*
+    responsive (useLayout is not asynchronous, is synchronous) 
+    we use it so we wont have any misplaced components. 
+    */
     useLayoutEffect(() => {
         function handleResize() {
 
@@ -245,7 +287,7 @@ function DisplayChess() {
 
                 {userDoc && <Badge m={1} colorScheme='purple'> LGRig IP: {userDoc.data()?.lqrigip}</Badge>}
                 {value && <Badge m={1} colorScheme={value.data().turn == 'w' ? "blue" : "yellow"}>
-                    Turn: {value.data().turn == 'w' ? "Earth" : "Space"}</Badge>}
+                    Turn: {value.data()?.turn == 'w' ? "Earth" : "Space"}</Badge>}
                 {userDoc && value &&
                     <Chessboard
                         boardWidth={isMobile ? (dimensions.width - 20 > 560 ? 340 : dimensions.width - 20) : 560}
@@ -269,34 +311,27 @@ function DisplayChess() {
                 }
 
                 <Text m={1}></Text>
-
+                
+                {/* LGRig Controller */}
+                {conStat == 'Connected' && 
+                    <HStack>
+                        <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={() => sendInstruction('showDemo')}>Demo</Button>
+                        <Button mt={10} m={1} w={20} size='sm' colorScheme='orange' onClick={() => sendInstruction('showChess')}>Chess</Button>
+                        <Button mt={10} m={1} w={20} size='sm' colorScheme='green' onClick={() => sendInstruction('showEarth')}>Earth</Button>
+                    </HStack>
+                    &&
+                    <Center>
+                        <Button mt={10} onClick={ () => sendMove(0,-50) }>&uarr;</Button>
+                        <HStack>
+                            <Button mt={10}  onClick={ () => sendMove(50,0) }>&larr;</Button>
+                            <Button mt={10} onClick={ () => sendMove(-50,0) }>&rarr;</Button>
+                        </HStack>
+                        <Button mt={10} onClick={ () => sendMove(0,50) }>&darr;</Button>
+                    </Center>
+                }
             </Flex>
-
-            {/* <Footer position="absolute" w="100%" height="2.5rem" bottom={0}/> */}
-            {/* <Box
-                // screen.orientation.type
-                mt={10}
-                position="relative"
-                w="100%"
-                height="3.5rem"
-                bottom={0}
-                bg='black'
-                color='white'>
-                <Container
-                    as={Stack}
-                    maxW={'6xl'}
-                    py={4}
-                    direction={{ base: 'column', md: 'row' }}
-                    spacing={4}
-                    justify={{ base: 'center', md: 'space-between' }}
-                    align={{ base: 'center', md: 'center' }}>
-                    <Text>© 2022 Liquid Galaxy </Text>
-                </Container>
-            </Box> */}
-
         </VStack>
     )
 }
-
 
 export default DisplayChess

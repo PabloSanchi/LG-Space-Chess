@@ -9,7 +9,7 @@ import { MdLogout } from 'react-icons/md';
 import Head from 'next/head'
 
 
-function about() {
+function findsat() {
     return (
         <div>
           <Head>
@@ -22,4 +22,4 @@ function about() {
       )
 }
 
-export default about
+export default findsat

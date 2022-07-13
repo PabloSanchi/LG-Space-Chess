@@ -187,7 +187,7 @@ export default function Login() {
                             YOU
                         </Flex>
                     </Stack> */}
-                    <Image  viewBox="5 0 100 100" src={Spl} ></Image>
+                    <Image viewBox="5 0 100 100" src={Spl} alt="main logo"></Image>
                 </Stack>
                 <Stack
                     bg={'gray.50'}
