@@ -86,8 +86,8 @@ function DisplayChess() {
         console.log('IP: ' + userDoc.data()?.lqrigip);
         setConStat('Loading...');
         try {
-            setErrorText(`http://${userDoc.data()?.lqrigip}:8120`);
-            soc = io(`http://${userDoc.data()?.lqrigip}:8120`, {
+            // setErrorText(`wss://${userDoc.data()?.lqrigip}:8120`);
+            soc = io(`wss://${userDoc.data()?.lqrigip}:8120`, {
                 'reconnect': false,
                 'connect_timeout': 5000,
                 // transports: ['websocket', 'polling', 'flashsocket'],
