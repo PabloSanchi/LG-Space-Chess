@@ -256,14 +256,14 @@ function DisplayChess() {
         function handleResize() {
 
             setTimeout(() => {
-                if (window.innerWidth > 340) { //375
+                // if (window.innerWidth > 340) { //375
+                if (window.innerHeight > 345) { //375
                     setDimensions({
                         height: window.innerHeight,
                         width: window.innerWidth
                     })
                 }
             }, 100);
-
         }
 
         window.addEventListener('resize', handleResize)
