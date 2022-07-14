@@ -90,7 +90,7 @@ function DisplayChess() {
             soc = io(`http://${userDoc.data()?.lqrigip}:8120`, {
                 'reconnect': false,
                 'connect_timeout': 5000,
-                transports: ['websocket', 'polling', 'flashsocket'],
+                // transports: ['websocket', 'polling', 'flashsocket'],
                 query: "mobile=true"
             });
 
