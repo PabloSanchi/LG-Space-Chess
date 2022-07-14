@@ -338,9 +338,9 @@ function DisplayChess() {
 
                 <Text m={5}></Text>
                 
-                <Text>Error: {errorText}</Text>
+                {/* <Text>Error: {errorText}</Text> */}
 
-                <Text m={5}></Text>
+                {/* <Text m={5}></Text> */}
             </Flex>
         </VStack>
     )
