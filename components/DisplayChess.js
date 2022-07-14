@@ -257,7 +257,7 @@ function DisplayChess() {
 
             setTimeout(() => {
                 // if (window.innerWidth > 340) { //375
-                if (window.innerHeight > 345) { //375
+                if (window.innerHeight > 550) { //375
                     setDimensions({
                         height: window.innerHeight,
                         width: window.innerWidth

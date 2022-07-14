@@ -87,10 +87,6 @@ const Header = (props) => {
                                 </Button>
                                 <Button onClick={onClose}>Cancel</Button>
                             </HStack>
-                            <HStack>
-                                <Button onClick={() => console.log('demo')}>Demo</Button>
-                                <Button onClick={() => console.log('fun')}>ShowFun</Button>
-                            </HStack>
                         </VStack>
                     </ModalFooter>
                 </ModalContent>
