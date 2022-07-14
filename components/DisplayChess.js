@@ -90,6 +90,7 @@ function DisplayChess() {
             soc = io(`http://${userDoc.data()?.lqrigip}:8120`, {
                 'reconnect': false,
                 'connect_timeout': 5000,
+                transports: ['websocket', 'polling', 'flashsocket'],
                 query: "mobile=true"
             });
 
@@ -255,7 +256,7 @@ function DisplayChess() {
         function handleResize() {
 
             setTimeout(() => {
-                if (window.innerWidth > 375) {
+                if (window.innerWidth > 340) { //375
                     setDimensions({
                         height: window.innerHeight,
                         width: window.innerWidth
