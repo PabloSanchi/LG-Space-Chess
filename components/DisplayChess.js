@@ -85,7 +85,7 @@ function DisplayChess() {
     const handleConnect = async () => {
         console.log('IP: ' + userDoc.data()?.lqrigip);
         setConStat('Loading...');
-        process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+        // process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
         try {
             // setErrorText(`wss://${userDoc.data()?.lqrigip}:8120`);
             soc = io(`https://${userDoc.data()?.lqrigip}:8120`, {
