@@ -17,6 +17,7 @@ function DisplayChess() {
 
     // variable definition
     let soc = 'null';
+    let [errorText,setErrorText] = useState('');
     const router = useRouter();
     const [socket, setSocket] = useState(null);
     const [conStat, setConStat] = useState('Disconnected');
@@ -85,11 +86,14 @@ function DisplayChess() {
         console.log('IP: ' + userDoc.data()?.lqrigip);
         setConStat('Loading...');
         try {
-            soc = await io(`http://${userDoc.data()?.lqrigip}:8120`, {
+            setErrorText(`http://${userDoc.data()?.lqrigip}:8120`);
+            soc = io(`http://${userDoc.data()?.lqrigip}:8120`, {
                 'reconnect': false,
-                'connect_timeout': 1000,
+                'connect_timeout': 5000,
                 query: "mobile=true"
             });
+
+            // setErrorText(JSON.stringify(soc));
 
             setSocket(soc);
 
@@ -157,12 +161,12 @@ function DisplayChess() {
     */
     async function onDrop(sourceSquare, targetSquare) {
 
-        if (value.data().turn == 'b') {
+        if (value.data()?.turn == 'b') {
             notify('⚠️ Wait for your turn');
             return false;
         }
 
-        if (userDoc.data().limit <= 0) {
+        if (userDoc.data()?.limit <= 0) {
             notify('❌ Limit Reached: 3/3');
             setArrow([arrow[0], arrow[1]]);
             return false;
@@ -286,7 +290,7 @@ function DisplayChess() {
                 }
 
                 {userDoc && <Badge m={1} colorScheme='purple'> LGRig IP: {userDoc.data()?.lqrigip}</Badge>}
-                {value && <Badge m={1} colorScheme={value.data().turn == 'w' ? "blue" : "yellow"}>
+                {value && <Badge m={1} colorScheme={value.data()?.turn == 'w' ? "blue" : "yellow"}>
                     Turn: {value.data()?.turn == 'w' ? "Earth" : "Space"}</Badge>}
                 {userDoc && value &&
                     <Chessboard
@@ -314,21 +318,28 @@ function DisplayChess() {
                 
                 {/* LGRig Controller */}
                 {conStat == 'Connected' && 
-                    <HStack>
+                    <HStack >
                         <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={() => sendInstruction('showDemo')}>Demo</Button>
                         <Button mt={10} m={1} w={20} size='sm' colorScheme='orange' onClick={() => sendInstruction('showChess')}>Chess</Button>
                         <Button mt={10} m={1} w={20} size='sm' colorScheme='green' onClick={() => sendInstruction('showEarth')}>Earth</Button>
                     </HStack>
-                    &&
-                    <Center>
+                }
+                {conStat == 'Connected' && 
+                    <VStack>
                         <Button mt={10} onClick={ () => sendMove(0,-50) }>&uarr;</Button>
-                        <HStack>
-                            <Button mt={10}  onClick={ () => sendMove(50,0) }>&larr;</Button>
-                            <Button mt={10} onClick={ () => sendMove(-50,0) }>&rarr;</Button>
+                        <HStack >
+                            <Button mr={5} onClick={ () => sendMove(50,0) }>&larr;</Button>
+                            <Button ml={5} onClick={ () => sendMove(-50,0) }>&rarr;</Button>
                         </HStack>
                         <Button mt={10} onClick={ () => sendMove(0,50) }>&darr;</Button>
-                    </Center>
+                    </VStack>
                 }
+
+                <Text m={5}></Text>
+                
+                <Text>Error: {errorText}</Text>
+
+                <Text m={5}></Text>
             </Flex>
         </VStack>
     )
