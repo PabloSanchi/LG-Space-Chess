@@ -88,11 +88,12 @@ function DisplayChess() {
         // process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
         try {
             // setErrorText(`wss://${userDoc.data()?.lqrigip}:8120`);
-            soc = io(`http://${userDoc.data()?.lqrigip}:8120`, {
+            soc = io(`ws://${userDoc.data()?.lqrigip}:8120`, {
                 'reconnect': false,
-                'connect_timeout': 5000,
+                'connect_timeout': 2000,
                 // transports: ['websocket', 'polling', 'flashsocket'],
-                query: "mobile=true"
+                query: "mobile=true",
+                secure: false
             });
 
             // setErrorText(JSON.stringify(soc));
