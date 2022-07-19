@@ -9,28 +9,12 @@ import { useMap } from 'react-leaflet/hooks'
 import { Popup } from 'react-leaflet/Popup'
 import L from 'leaflet';
 
-// const {MapContainer} = dynamic(
-//     () => import('react-leaflet/MapContainer'),
-//     { ssr: false }
-// )
-
-// const {TileLayer} = dynamic(
-//     () => import('react-leaflet/TileLayer'),
-//     { ssr: false }
-// );
-
-// const {Marker} = dynamic(
-//     () => import('react-leaflet/Marker'),
-//     { ssr: false }
-// );
-
-
+import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
+import iconUrl from 'leaflet/dist/images/marker-icon.png';
+import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 import 'leaflet/dist/leaflet.css'
 
 const satellite = require('satellite.js');
-
-
-
 
 function DisplaySat() {
     // componentDidMount() {
@@ -40,13 +24,25 @@ function DisplaySat() {
     //     }
     //     logPageView()
     // }
-    // const satIcon = L.icon({
-    //     iconUrl: '../public/satimage.png',
-    //     shadowUrl: '../public/satimage.png',
-    //     iconSize:     [50, 32],
-    //     iconAnchor:   [25, 16],
-    //     popupAnchor:  [-3, -76]
-    // });
+    const satIcon = L.icon({
+        iconUrl: iconUrl,
+        shadowUrl: shadowUrl,
+        iconSize: [50, 32],
+        iconAnchor: [25, 16],
+        popupAnchor: [-3, -76]
+    });
+
+    useEffect(() => {
+        (async function init() {
+            delete L.Icon.Default.prototype._getIconUrl;
+
+            L.Icon.Default.mergeOptions({
+                iconRetinaUrl: iconRetinaUrl.src,
+                iconUrl: iconUrl.src,
+                shadowUrl: shadowUrl.src,
+            });
+        })();
+    }, []);
 
     const [loaded, setLoaded] = useState(false);
     const [info, setInfo] = useState('loading...');
@@ -56,12 +52,6 @@ function DisplaySat() {
     2 51080  97.5054 267.8175 0012792 351.4700   8.6314 15.16982496 28253`
 
     useEffect(() => {
-
-        // import { MapContainer } from 'react-leaflet/MapContainer'
-        // import { TileLayer } from 'react-leaflet/TileLayer'
-        // import { Marker } from 'react-leaflet/Marker'
-        // import { useMap } from 'react-leaflet/hooks'
-        // import { Popup } from 'react-leaflet/Popup'
 
         // Initialize the satellite record with this TLE
         const satrec = satellite.twoline2satrec(
@@ -80,8 +70,8 @@ function DisplaySat() {
         console.log(position.latitude);// in radians
         console.log(position.height);// in km
 
-        setTimeout(() => { setInfo(`coords (long, lat): ${position.longitude}, ${position.latitude}`); setLoaded(true); }, 2000);
-
+        setInfo(`coords (long, lat): ${position.longitude}, ${position.latitude}`);
+        setLoaded(true);
     }, []);
 
 
@@ -109,13 +99,13 @@ function DisplaySat() {
         <VStack>
             <Text>{info}</Text>
 
-            {loaded && 
+            {loaded &&
                 <MapContainer center={coord} zoom={4} scrollWheelZoom={false}>
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    {/* icon={satIcon} */}
+
                     <Marker position={coord}>
                     </Marker>
                 </MapContainer>
