@@ -7,23 +7,46 @@ import { TileLayer } from 'react-leaflet/TileLayer'
 import { Marker } from 'react-leaflet/Marker'
 import { useMap } from 'react-leaflet/hooks'
 import { Popup } from 'react-leaflet/Popup'
-
 import L from 'leaflet';
+
+// const {MapContainer} = dynamic(
+//     () => import('react-leaflet/MapContainer'),
+//     { ssr: false }
+// )
+
+// const {TileLayer} = dynamic(
+//     () => import('react-leaflet/TileLayer'),
+//     { ssr: false }
+// );
+
+// const {Marker} = dynamic(
+//     () => import('react-leaflet/Marker'),
+//     { ssr: false }
+// );
+
 
 import 'leaflet/dist/leaflet.css'
 
-// import { satellite } from 'satellite.js';
 const satellite = require('satellite.js');
 
-const satIcon = L.icon({
-    iconUrl: '../public/satimage.png',
-    shadowUrl: '../public/satimage.png',
-    iconSize:     [50, 32],
-    iconAnchor:   [25, 16],
-    popupAnchor:  [-3, -76]
-});
+
+
 
 function DisplaySat() {
+    // componentDidMount() {
+    //     if (!window.GA_INITIALIZED) {
+    //         initGA()
+    //         window.GA_INITIALIZED = true
+    //     }
+    //     logPageView()
+    // }
+    // const satIcon = L.icon({
+    //     iconUrl: '../public/satimage.png',
+    //     shadowUrl: '../public/satimage.png',
+    //     iconSize:     [50, 32],
+    //     iconAnchor:   [25, 16],
+    //     popupAnchor:  [-3, -76]
+    // });
 
     const [loaded, setLoaded] = useState(false);
     const [info, setInfo] = useState('loading...');
@@ -33,6 +56,12 @@ function DisplaySat() {
     2 51080  97.5054 267.8175 0012792 351.4700   8.6314 15.16982496 28253`
 
     useEffect(() => {
+
+        // import { MapContainer } from 'react-leaflet/MapContainer'
+        // import { TileLayer } from 'react-leaflet/TileLayer'
+        // import { Marker } from 'react-leaflet/Marker'
+        // import { useMap } from 'react-leaflet/hooks'
+        // import { Popup } from 'react-leaflet/Popup'
 
         // Initialize the satellite record with this TLE
         const satrec = satellite.twoline2satrec(
@@ -51,7 +80,7 @@ function DisplaySat() {
         console.log(position.latitude);// in radians
         console.log(position.height);// in km
 
-        setTimeout(() => { setInfo(`coords (long, lat): ${position.longitude}, ${position.latitude}`); setLoaded(true); }, 1000);
+        setTimeout(() => { setInfo(`coords (long, lat): ${position.longitude}, ${position.latitude}`); setLoaded(true); }, 2000);
 
     }, []);
 
@@ -70,25 +99,24 @@ function DisplaySat() {
             const position = satellite.eciToGeodetic(positionAndVelocity.position, gmst);
             setCoord([position.longitude, position.latitude]);
             setInfo(`coords (long, lat): ${position.longitude}, ${position.latitude}`);
-            
+
         }, 10000);
         return () => clearInterval(interval);
     }, []);
+
 
     return (
         <VStack>
             <Text>{info}</Text>
 
-            {loaded &&
+            {loaded && 
                 <MapContainer center={coord} zoom={4} scrollWheelZoom={false}>
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    <Marker position={coord} icon={satIcon}>
-                        <Popup>
-                            POCKETSAT <br /> Current Location .
-                        </Popup>
+                    {/* icon={satIcon} */}
+                    <Marker position={coord}>
                     </Marker>
                 </MapContainer>
             }

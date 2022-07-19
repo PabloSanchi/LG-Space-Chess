@@ -8,8 +8,13 @@ import { Box, Button, Center, Stack, Text } from '@chakra-ui/react';
 import { MdLogout } from 'react-icons/md';
 import Head from 'next/head'
 import Header from '../components/Header';
-import DisplaySat from '../components/DisplaySat';
+// import DisplaySat from '../components/DisplaySat';
 
+import dynamic from 'next/dynamic';
+
+const Map = dynamic(() => import('../components/DisplaySat'), {
+  ssr: false
+});
 
 function findsat() {
     return (
@@ -20,7 +25,7 @@ function findsat() {
             <link rel="icon" href="/favicon.ico" />
           </Head>
           <Header />
-          <DisplaySat />
+          <Map />
         </div>
       )
 }
