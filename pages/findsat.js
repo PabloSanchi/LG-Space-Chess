@@ -7,6 +7,8 @@ import { FcGoogle } from 'react-icons/fc';
 import { Box, Button, Center, Stack, Text } from '@chakra-ui/react';
 import { MdLogout } from 'react-icons/md';
 import Head from 'next/head'
+import Header from '../components/Header';
+import DisplaySat from '../components/DisplaySat';
 
 
 function findsat() {
@@ -17,7 +19,8 @@ function findsat() {
             <meta name="description" content="" />
             <link rel="icon" href="/favicon.ico" />
           </Head>
-          <Text>FindSat</Text>
+          <Header />
+          <DisplaySat />
         </div>
       )
 }
