@@ -155,6 +155,17 @@ function DisplayChess() {
         }
     }
 
+    /*
+    updateView -> set view perspective (center, white, black)
+    */
+    const updateView = (value) => {
+        if (socket) {
+            socket.emit('updateView', {
+                where: value
+            });
+        }
+    }
+
     /* 
     onDrop modification
         we give some extra functions:
@@ -188,7 +199,7 @@ function DisplayChess() {
         move = game.move({
             from: sourceSquare,
             to: targetSquare,
-            // promotion: "q", // promote to queen (not used yet)
+            promotion: "q",
         });
 
         // illegal move
@@ -320,28 +331,32 @@ function DisplayChess() {
                 
                 {/* LGRig Controller */}
                 {conStat == 'Connected' && 
-                    <HStack >
-                        <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={() => sendInstruction('showDemo')}>Demo</Button>
-                        <Button mt={10} m={1} w={20} size='sm' colorScheme='orange' onClick={() => sendInstruction('showChess')}>Chess</Button>
-                        <Button mt={10} m={1} w={20} size='sm' colorScheme='green' onClick={() => sendInstruction('showEarth')}>Earth</Button>
-                    </HStack>
+                    <VStack>
+                        <HStack >
+                            <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={() => sendInstruction('showDemo')}>Demo</Button>
+                            <Button mt={10} m={1} w={20} size='sm' colorScheme='orange' onClick={() => sendInstruction('showChess')}>Chess</Button>
+                            <Button mt={10} m={1} w={20} size='sm' colorScheme='green' onClick={() => sendInstruction('showEarth')}>Earth</Button>
+                        </HStack>
+                        <HStack >
+                            <Button mt={10} m={1} w={20} size='sm' colorScheme='gray' onClick={() => updateView('white')}>White</Button>
+                            <Button mt={10} m={1} w={20} size='sm' colorScheme='gray' onClick={() => updateView('black')}>Black</Button>
+                            <Button mt={10} m={1} w={20} size='sm' colorScheme='gray' onClick={() => updateView('center')}>Center</Button>
+                        </HStack>
+                    </VStack>
                 }
                 {conStat == 'Connected' && 
                     <VStack>
-                        <Button mt={10} onClick={ () => sendMove(0,-50) }>&uarr;</Button>
+                        <Button mt={10} w={50} h={50} onClick={ () => sendMove(0,-50) }>&uarr;</Button>
                         <HStack >
-                            <Button mr={5} onClick={ () => sendMove(50,0) }>&larr;</Button>
-                            <Button ml={5} onClick={ () => sendMove(-50,0) }>&rarr;</Button>
+                            <Button mr={5} w={50} h={50} onClick={ () => sendMove(50,0) }>&larr;</Button>
+                            <Button ml={5} w={50} h={50} onClick={ () => sendMove(-50,0) }>&rarr;</Button>
                         </HStack>
-                        <Button mt={10} onClick={ () => sendMove(0,50) }>&darr;</Button>
+                        <Button mt={10} w={50} h={50} onClick={ () => sendMove(0,50) }>&darr;</Button>
                     </VStack>
                 }
 
                 <Text m={5}></Text>
                 
-                {/* <Text>Error: {errorText}</Text> */}
-
-                {/* <Text m={5}></Text> */}
             </Flex>
         </VStack>
     )
