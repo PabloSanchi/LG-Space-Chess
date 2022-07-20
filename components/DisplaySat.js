@@ -141,6 +141,9 @@ function DisplaySat() {
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
                         <Marker position={coord}>
+                            <Popup>
+                                {`${coord[0]}, ${coord[1]}`}
+                            </Popup>
                         </Marker>
                     </MapContainer>
                     
