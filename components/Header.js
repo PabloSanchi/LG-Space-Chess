@@ -100,7 +100,7 @@ const Header = (props) => {
             // backgroundColor='red.700'
             // bgGradient='linear(to-r, purple.700,blue.700)'
             bgGradient='linear(to-r, #CD853F, #DAA520)'
-            mb={8}
+            mb={2}
             p={8}
             as="nav"
             align="center"

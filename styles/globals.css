@@ -16,6 +16,8 @@ a {
 }
 
 .leaflet-container {
-  width: 100vw;
-  height: 100vh;
+  border-radius: 10px;
+  width: calc(100vw - 1rem);
+  height: calc(100vh - 10rem);
+  border: solid 2px black;
 }
