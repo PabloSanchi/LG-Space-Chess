@@ -14,6 +14,7 @@ import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 import 'leaflet/dist/leaflet.css'
 
+
 const satellite = require('satellite.js');
 
 function DisplaySat() {
@@ -48,49 +49,148 @@ function DisplaySat() {
     const [info, setInfo] = useState('loading...');
     const [coord, setCoord] = useState([51.505, -0.09]);
 
-    const TLE = `1 51080U 22002DA  22200.13694574  .00008725  00000+0  44414-3 0  9996
-    2 51080  97.5054 267.8175 0012792 351.4700   8.6314 15.16982496 28253`
+    // const TLE = 
+    // `1 25544U 98067A   21122.75616700  .00027980  00000-0  51432-3 0  9994
+    // 2 25544  51.6442 207.4449 0002769 310.1189 193.6568 15.48993527281553`;
+    const TLE = `1 25544U 98067A   17206.18396726  .00001961  00000-0  36771-4 0  9993
+    2 25544  51.6400 208.9163 0006317  69.9862  25.2906 15.54225995 67660`;
+
+    // `1 51080U 22002DA  22200.13694574  .00008725  00000+0  44414-3 0  9996
+    // 2 51080  97.5054 267.8175 0012792 351.4700   8.6314 15.16982496 28253`
 
     useEffect(() => {
 
-        // Initialize the satellite record with this TLE
-        const satrec = satellite.twoline2satrec(
-            TLE.split('\n')[0].trim(),
-            TLE.split('\n')[1].trim()
-        );
+        // var tleLine1 = '1 25544U 98067A   19156.50900463  .00003075  00000-0  59442-4 0  9992',
+        //     tleLine2 = '2 25544  51.6433  59.2583 0008217  16.4489 347.6017 15.51174618173442';
 
-        // Get the position of the satellite at the given date
-        const date = new Date();
-        const positionAndVelocity = satellite.propagate(satrec, date);
-        const gmst = satellite.gstime(date);
-        const position = satellite.eciToGeodetic(positionAndVelocity.position, gmst);
+        var tleLine1 = '1 51080U 22002DA  22200.13694574  .00008725  00000+0  44414-3 0  9996',
+            tleLine2 = '2 25544  51.6400 208.9163 0006317  69.9862  25.2906 15.54225995 67660';
 
-        setCoord([position.longitude, position.latitude]);
-        console.log(position.longitude);// in radians
-        console.log(position.latitude);// in radians
-        console.log(position.height);// in km
+        // Initialize a satellite record
+        var satrec = satellite.twoline2satrec(tleLine1, tleLine2);
 
-        setInfo(`coords (long, lat): ${position.longitude}, ${position.latitude}`);
+        //  Propagate satellite using time since epoch (in minutes).
+        let timestamp = new Date().getTime();
+        let hours = Math.floor(timestamp / 60 / 60);
+        let timeSinceTleEpochMinutes = Math.floor(timestamp / 60);
+        var positionAndVelocity = satellite.sgp4(satrec, timeSinceTleEpochMinutes);
+
+        //  Or you can use a JavaScript Date
+        var positionAndVelocity = satellite.propagate(satrec, new Date());
+
+        // The position_velocity result is a key-value pair of ECI coordinates.
+        // These are the base results from which all other coordinates are derived.
+        var positionEci = positionAndVelocity.position,
+            velocityEci = positionAndVelocity.velocity;
+
+        // Set the Observer at 122.03 West by 36.96 North, in RADIANS
+        var observerGd = {
+            longitude: satellite.degreesToRadians(-122.0308),
+            latitude: satellite.degreesToRadians(36.9613422),
+            height: 0.370
+        };
+
+        // You will need GMST for some of the coordinate transforms.
+        // http://en.wikipedia.org/wiki/Sidereal_time#Definition
+        var gmst = satellite.gstime(new Date());
+
+        // You can get ECF, Geodetic, Look Angles, and Doppler Factor.
+        var positionEcf = satellite.eciToEcf(positionEci, gmst),
+            observerEcf = satellite.geodeticToEcf(observerGd),
+            positionGd = satellite.eciToGeodetic(positionEci, gmst),
+            lookAngles = satellite.ecfToLookAngles(observerGd, positionEcf);
+
+        // The coordinates are all stored in key-value pairs.
+        // ECI and ECF are accessed by `x`, `y`, `z` properties.
+        var satelliteX = positionEci.x,
+            satelliteY = positionEci.y,
+            satelliteZ = positionEci.z;
+
+        // Look Angles may be accessed by `azimuth`, `elevation`, `range_sat` properties.
+        var azimuth = lookAngles.azimuth,
+            elevation = lookAngles.elevation,
+            rangeSat = lookAngles.rangeSat;
+
+        // Geodetic coords are accessed via `longitude`, `latitude`, `height`.
+        var longitude = positionGd.longitude,
+            latitude = positionGd.latitude,
+            height = positionGd.height;
+
+        //  Convert the RADIANS to DEGREES.
+        var longitudeDeg = satellite.degreesLong(longitude),
+            latitudeDeg = satellite.degreesLat(latitude);
+
+
+        setCoord([latitudeDeg, longitudeDeg]);
+        setInfo(`coords (long, lat): ${latitudeDeg}, ${longitudeDeg}`);
         setLoaded(true);
     }, []);
 
 
     useEffect(() => {
         const interval = setInterval(() => {
-            // Initialize the satellite record with this TLE
-            const satrec = satellite.twoline2satrec(
-                TLE.split('\n')[0].trim(),
-                TLE.split('\n')[1].trim()
-            );
+            var tleLine1 = '1 51080U 22002DA  22200.13694574  .00008725  00000+0  44414-3 0  9996',
+                tleLine2 = '2 25544  51.6400 208.9163 0006317  69.9862  25.2906 15.54225995 67660';
 
-            const date = new Date();
-            const positionAndVelocity = satellite.propagate(satrec, date);
-            const gmst = satellite.gstime(date);
-            const position = satellite.eciToGeodetic(positionAndVelocity.position, gmst);
-            setCoord([position.longitude, position.latitude]);
-            setInfo(`coords (long, lat): ${position.longitude}, ${position.latitude}`);
+            // Initialize a satellite record
+            var satrec = satellite.twoline2satrec(tleLine1, tleLine2);
 
-        }, 10000);
+            //  Propagate satellite using time since epoch (in minutes).
+            let timestamp = new Date().getTime();
+            let hours = Math.floor(timestamp / 60 / 60);
+            let timeSinceTleEpochMinutes = Math.floor(timestamp / 60);
+            var positionAndVelocity = satellite.sgp4(satrec, timeSinceTleEpochMinutes);
+
+            //  Or you can use a JavaScript Date
+            var positionAndVelocity = satellite.propagate(satrec, new Date());
+
+            // The position_velocity result is a key-value pair of ECI coordinates.
+            // These are the base results from which all other coordinates are derived.
+            var positionEci = positionAndVelocity.position,
+                velocityEci = positionAndVelocity.velocity;
+
+            // Set the Observer at 122.03 West by 36.96 North, in RADIANS
+            var observerGd = {
+                longitude: satellite.degreesToRadians(-122.0308),
+                latitude: satellite.degreesToRadians(36.9613422),
+                height: 0.370
+            };
+
+            // You will need GMST for some of the coordinate transforms.
+            // http://en.wikipedia.org/wiki/Sidereal_time#Definition
+            var gmst = satellite.gstime(new Date());
+
+            // You can get ECF, Geodetic, Look Angles, and Doppler Factor.
+            var positionEcf = satellite.eciToEcf(positionEci, gmst),
+                observerEcf = satellite.geodeticToEcf(observerGd),
+                positionGd = satellite.eciToGeodetic(positionEci, gmst),
+                lookAngles = satellite.ecfToLookAngles(observerGd, positionEcf);
+
+            // The coordinates are all stored in key-value pairs.
+            // ECI and ECF are accessed by `x`, `y`, `z` properties.
+            var satelliteX = positionEci.x,
+                satelliteY = positionEci.y,
+                satelliteZ = positionEci.z;
+
+            // Look Angles may be accessed by `azimuth`, `elevation`, `range_sat` properties.
+            var azimuth = lookAngles.azimuth,
+                elevation = lookAngles.elevation,
+                rangeSat = lookAngles.rangeSat;
+
+            // Geodetic coords are accessed via `longitude`, `latitude`, `height`.
+            var longitude = positionGd.longitude,
+                latitude = positionGd.latitude,
+                height = positionGd.height;
+
+            //  Convert the RADIANS to DEGREES.
+            var longitudeDeg = satellite.degreesLong(longitude),
+                latitudeDeg = satellite.degreesLat(latitude);
+
+
+            setCoord([latitudeDeg, longitudeDeg]);
+            setInfo(`coords (long, lat): ${latitudeDeg}, ${longitudeDeg}`);
+
+        }, 5000);
         return () => clearInterval(interval);
     }, []);
 
