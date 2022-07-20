@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
-import { VStack, Text, Center } from '@chakra-ui/react';
+import { VStack, Text, Center, Button } from '@chakra-ui/react';
 import dynamic from 'next/dynamic'
 
 import { MapContainer } from 'react-leaflet/MapContainer'
@@ -19,20 +19,6 @@ import iconUrl2 from '../public/satimage.png';
 const satellite = require('satellite.js');
 
 function DisplaySat() {
-    // componentDidMount() {
-    //     if (!window.GA_INITIALIZED) {
-    //         initGA()
-    //         window.GA_INITIALIZED = true
-    //     }
-    //     logPageView()
-    // }
-    const satIcon = L.icon({
-        iconUrl: iconUrl,
-        shadowUrl: shadowUrl,
-        iconSize: [50, 32],
-        iconAnchor: [25, 16],
-        popupAnchor: [-3, -76]
-    });
 
     useEffect(() => {
         (async function init() {
@@ -49,6 +35,7 @@ function DisplaySat() {
     const [loaded, setLoaded] = useState(false);
     const [info, setInfo] = useState('loading...');
     const [coord, setCoord] = useState([51.505, -0.09]);
+    const [follow, setFollow] = useState(true);
 
     // const TLE = 
     // `1 25544U 98067A   21122.75616700  .00027980  00000-0  51432-3 0  9994
@@ -74,7 +61,7 @@ function DisplaySat() {
             setCoord(coords);
             setInfo(`[lat, lng]: ${coords[0]}, ${coords[1]}`);
 
-        }, 5000);
+        }, 2000);
         return () => clearInterval(interval);
     }, []);
 
@@ -136,21 +123,27 @@ function DisplaySat() {
         return [latitudeDeg, longitudeDeg];
     }
 
+    function ChangeView({ center }) {
+        const map = useMap();
+        if(follow) map.setView(center);
+    }
+
     return (
         <VStack display="absolute">
             {/* <Center><Text>{info}</Text></Center> */}
+            <Button ml={2} colorScheme="blue" onClick={() => setFollow(!follow)}>{!follow ? 'Track' : 'Untrack'}</Button>
             {loaded &&
-            <Center>
-                <MapContainer center={coord} zoom={4} scrollWheelZoom={false}>
-                    <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-
-                    <Marker position={coord}>
-                    </Marker>
-                </MapContainer>
-            </Center>
+                <Center>
+                    <MapContainer center={coord} zoom={(window.innerWidth > 1000 ? 3 : 2)} scrollWheelZoom={false}>
+                        <ChangeView center={coord} /> 
+                        <TileLayer
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        />
+                        <Marker position={coord}>
+                        </Marker>
+                    </MapContainer>
+                </Center>
             }
         </VStack>
         // <MapContainer w={8000} h={800}center={[51.505, -0.09]} zoom={13} scrollWheelZoom={false}>
