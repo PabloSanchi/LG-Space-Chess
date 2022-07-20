@@ -293,7 +293,7 @@ function DisplayChess() {
             <Header />
             <Flex direction="column">
                 <Toaster />
-                <Input focusBorderColor='blue.300s' placeholder='set input' onChange={(e) => setUrlSoc(e.target.value)}/>
+                <Input size="sm" focusBorderColor='blue.300s' placeholder='set input' onChange={(e) => setUrlSoc(e.target.value)}/>
                 <Text>{urlSoc}</Text>
                 {error && <strong>Error: {JSON.stringify(error)}</strong>}
                 {loading && <TailSpin type="Puff" color="#808080" height="100%" width="100%" />}
