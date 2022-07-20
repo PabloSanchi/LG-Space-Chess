@@ -6,7 +6,7 @@ import { Chess } from "chess.js";
 import toast, { Toaster } from 'react-hot-toast';
 import Header from './Header';
 import { useMediaQuery } from '@chakra-ui/react'
-import { Stack, Box, HStack, Button, Text, Flex, VStack, Tag, Badge } from '@chakra-ui/react';
+import { Stack, Box, HStack, Button, Text, Flex, VStack, Tag, Badge, Input } from '@chakra-ui/react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db, doc } from "../firebase";
 import { collection, updateDoc, setDoc, getDoc } from "firebase/firestore";
@@ -28,6 +28,8 @@ function DisplayChess() {
         height: window.innerHeight,
         width: window.innerWidth
     }) // responsive (affect chessboard only)
+
+    const [urlSoc, setUrlSoc] = useState('');
 
     // fetch chessboard status
     const [value, loading, error] = useDocument(
@@ -90,7 +92,7 @@ function DisplayChess() {
             // setErrorText(`wss://${userDoc.data()?.lqrigip}:8120`);
             
             // soc = io(`ws://${userDoc.data()?.lqrigip}:8120/`, {
-            soc = io('https://e4bd-217-217-248-229.eu.ngrok.io/', {
+            soc = io(urlSoc, {
                 'reconnect': false,
                 'connect_timeout': 5000,
                 // transports: ['websocket', 'polling', 'flashsocket'],
@@ -291,6 +293,8 @@ function DisplayChess() {
             <Header />
             <Flex direction="column">
                 <Toaster />
+                <Input focusBorderColor='blue.300' placeholder='set input' onChange={(e) => setUrlSoc(e.target.value)}/>
+                <Text>{urlSoc}</Text>
                 {error && <strong>Error: {JSON.stringify(error)}</strong>}
                 {loading && <TailSpin type="Puff" color="#808080" height="100%" width="100%" />}
 
