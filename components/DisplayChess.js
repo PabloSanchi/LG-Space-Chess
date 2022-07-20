@@ -88,9 +88,11 @@ function DisplayChess() {
         // process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
         try {
             // setErrorText(`wss://${userDoc.data()?.lqrigip}:8120`);
-            soc = io(`ws://${userDoc.data()?.lqrigip}:8120/`, {
+            
+            // soc = io(`ws://${userDoc.data()?.lqrigip}:8120/`, {
+            soc = io('https://e4bd-217-217-248-229.eu.ngrok.io/', {
                 'reconnect': false,
-                'connect_timeout': 2000,
+                'connect_timeout': 5000,
                 // transports: ['websocket', 'polling', 'flashsocket'],
                 query: "mobile=true",
             });
