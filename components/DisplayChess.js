@@ -96,7 +96,7 @@ function DisplayChess() {
                 'reconnect': false,
                 'connect_timeout': 2000,
                 // transports: ['websocket', 'polling', 'flashsocket'],
-                transports: ['polling'],
+                transports: ['flashsocket'],
                 query: "mobile=true",
             });
 
