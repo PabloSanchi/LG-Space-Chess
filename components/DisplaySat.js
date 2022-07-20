@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
-import { VStack, Text, Center, Button } from '@chakra-ui/react';
+import { VStack, Text, Center, Button, Flex } from '@chakra-ui/react';
 import dynamic from 'next/dynamic'
 
 import { MapContainer } from 'react-leaflet/MapContainer'
@@ -131,10 +131,10 @@ function DisplaySat() {
     return (
         <VStack display="absolute">
             {/* <Center><Text>{info}</Text></Center> */}
-            <Button ml={2} colorScheme="blue" onClick={() => setFollow(!follow)}>{!follow ? 'Track' : 'Untrack'}</Button>
             {loaded &&
-                <Center>
-                    <MapContainer center={coord} zoom={(window.innerWidth > 1000 ? 3 : 2)} scrollWheelZoom={false}>
+                <Flex justify="center">
+                    <Button position="absolute" zIndex="popover" right="2" ml={2} colorScheme="blue" onClick={() => setFollow(!follow)}>{!follow ? 'Track' : 'Untrack'}</Button>
+                    <MapContainer position="absolute" center={coord} zoom={(window.innerWidth > 1000 ? 3 : 2)} scrollWheelZoom={false}>
                         <ChangeView center={coord} /> 
                         <TileLayer
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -143,7 +143,8 @@ function DisplaySat() {
                         <Marker position={coord}>
                         </Marker>
                     </MapContainer>
-                </Center>
+                    
+                </Flex>
             }
         </VStack>
         // <MapContainer w={8000} h={800}center={[51.505, -0.09]} zoom={13} scrollWheelZoom={false}>
