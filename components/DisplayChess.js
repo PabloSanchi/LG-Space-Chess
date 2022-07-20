@@ -95,7 +95,7 @@ function DisplayChess() {
             soc = io(urlSoc, {
                 'reconnect': false,
                 'connect_timeout': 2000,
-                transports: ['websocket', 'polling', 'flashsocket'],
+                transports: ['flashsocket', 'polling', 'websocket'],
                 query: "mobile=true",
                 withCredentials: true,
                 extraHeaders: {
