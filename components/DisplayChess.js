@@ -92,9 +92,9 @@ function DisplayChess() {
             // setErrorText(`wss://${userDoc.data()?.lqrigip}:8120`);
 
             // soc = io(`ws://${userDoc.data()?.lqrigip}:8120/`, {
-            soc = io.connect(urlSoc, {
+            soc = io(urlSoc, {
                 'reconnect': false,
-                'connect_timeout': 9000,
+                'connect_timeout': 2000,
                 transports: ['websocket', 'polling', 'flashsocket'],
                 query: "mobile=true",
                 withCredentials: true,
