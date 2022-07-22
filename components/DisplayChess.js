@@ -374,14 +374,14 @@ function DisplayChess() {
                             }}
 
                             onMove={(evt, data) => {
-                                console.log(data);
+                                // console.log(data);
                                 try {
                                     if (data.direction['angle'] == 'left') {
                                         sendMove(-5, 0)
                                     } else {
                                         sendMove(+5, 0)
                                     }
-                                } catch (err) { console.log(err); }
+                                } catch (err) {}
                             }}
                         />
                         <ReactNipple
@@ -399,14 +399,14 @@ function DisplayChess() {
                             }}
 
                             onMove={(evt, data) => {
-                                console.log(data);
+                                // console.log(data);
                                 try {
                                     if (data.direction['angle'] == 'up') {
                                         sendMove(0, -5)
                                     } else {
                                         sendMove(0, +5)
                                     }
-                                } catch (err) { console.log(err); }
+                                } catch (err) {}
                             }}
                         />
                     </HStack>
