@@ -12,12 +12,13 @@ import { auth, db, doc } from "../firebase";
 import { collection, updateDoc, setDoc, getDoc } from "firebase/firestore";
 import { io } from "socket.io-client";
 import { useRouter } from 'next/router'
+import ReactNipple from 'react-nipple';
 
 function DisplayChess() {
 
     // variable definition
     let soc = 'null';
-    let [errorText,setErrorText] = useState('');
+    let [errorText, setErrorText] = useState('');
     const router = useRouter();
     const [socket, setSocket] = useState(null);
     const [conStat, setConStat] = useState('Disconnected');
@@ -46,7 +47,7 @@ function DisplayChess() {
             snapshotListenOptions: { includeMetadataChanges: true },
         }
     );
-    
+
     // notifications
     const notify = (text) => toast(text);
 
@@ -73,7 +74,7 @@ function DisplayChess() {
     handle black pieces move when value().data.status changes
     */
     useEffect(() => {
-        if (socket) { 
+        if (socket) {
             socket.emit('newStatus', {
                 status: value?.data()?.status,
                 move: ''
@@ -90,7 +91,7 @@ function DisplayChess() {
         // process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
         try {
             // setErrorText(`wss://${userDoc.data()?.lqrigip}:8120`);
-            
+
             // soc = io(`ws://${userDoc.data()?.lqrigip}:8120/`, {
             soc = io(urlSoc, {
                 'reconnect': false,
@@ -111,21 +112,21 @@ function DisplayChess() {
                     status: value.data().status
                 });
             });
-        
+
             soc.on("connect_error", (err) => {
                 console.log(`connect_error due to ${err.message}`);
                 soc.disconnect();
                 setConStat('Fail');
             });
-          
+
         } catch (err) {
             notify('⚠️ Fatal Error: Refreshing');
             router.reload(window.location.pathname)
         }
     }
 
-    const handleDisconnect = async() => {
-        if (socket) { 
+    const handleDisconnect = async () => {
+        if (socket) {
             socket.emit('quit');
             socket.disconnect();
             setConStat('Disconnected');
@@ -214,7 +215,7 @@ function DisplayChess() {
         }
 
         // send fen status to the rig (if connected):
-        if(socket) {
+        if (socket) {
             socket.emit('newStatus', {
                 status: value.data().status, // game.fen().split(' ')[0], 
                 move: (sourceSquare + ' ' + targetSquare)
@@ -293,7 +294,7 @@ function DisplayChess() {
             <Header />
             <Flex direction="column">
                 <Toaster />
-                <Input size="sm" focusBorderColor='blue.300s' placeholder='set input' onChange={(e) => setUrlSoc(e.target.value)}/>
+                <Input size="sm" focusBorderColor='blue.300s' placeholder='set input' onChange={(e) => setUrlSoc(e.target.value)} />
                 <Text>{urlSoc}</Text>
                 {error && <strong>Error: {JSON.stringify(error)}</strong>}
                 {loading && <TailSpin type="Puff" color="#808080" height="100%" width="100%" />}
@@ -334,9 +335,9 @@ function DisplayChess() {
                 }
 
                 <Text m={1}></Text>
-                
+
                 {/* LGRig Controller */}
-                {conStat == 'Connected' && 
+                {conStat == 'Connected' &&
                     <VStack>
                         <HStack >
                             <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={() => sendInstruction('showDemo')}>Demo</Button>
@@ -350,22 +351,73 @@ function DisplayChess() {
                         </HStack>
                     </VStack>
                 }
-                {conStat == 'Connected' && 
-                    <VStack>
-                        <Button mt={10} w={50} h={50} onClick={ () => sendMove(0,-50) }>&uarr;</Button>
+                {conStat == 'Connected' &&
+                    <HStack m={5} justifyContent={'center'}>
+                        {/* <Button mt={10} w={50} h={50} onClick={ () => sendMove(0,-50) }>&uarr;</Button>
                         <HStack >
                             <Button mr={5} w={50} h={50} onClick={ () => sendMove(50,0) }>&larr;</Button>
                             <Button ml={5} w={50} h={50} onClick={ () => sendMove(-50,0) }>&rarr;</Button>
                         </HStack>
-                        <Button mt={10} w={50} h={50} onClick={ () => sendMove(0,50) }>&darr;</Button>
-                    </VStack>
+                        <Button mt={10} w={50} h={50} onClick={ () => sendMove(0,50) }>&darr;</Button> */}
+                        <ReactNipple
+
+                            options={{
+                                color: "green",
+                                lockX: true,
+                                mode: "static",
+                                position: { top: "50%", left: "50%" }
+                            }}
+
+                            style={{
+                                width: 120,
+                                height: 120,
+                                position: "relative"
+                            }}
+
+                            onMove={(evt, data) => {
+                                console.log(data);
+                                try {
+                                    if (data.direction['angle'] == 'left') {
+                                        sendMove(-5, 0)
+                                    } else {
+                                        sendMove(+5, 0)
+                                    }
+                                } catch (err) { console.log(err); }
+                            }}
+                        />
+                        <ReactNipple
+                            options={{
+                                color: "blue",
+                                lockY: true,
+                                mode: "static",
+                                position: { top: "50%", left: "50%" }
+                            }}
+
+                            style={{
+                                width: 120,
+                                height: 120,
+                                position: "relative"
+                            }}
+
+                            onMove={(evt, data) => {
+                                console.log(data);
+                                try {
+                                    if (data.direction['angle'] == 'up') {
+                                        sendMove(0, -5)
+                                    } else {
+                                        sendMove(0, +5)
+                                    }
+                                } catch (err) { console.log(err); }
+                            }}
+                        />
+                    </HStack>
                 }
 
-                <Text m={5}></Text>
-                
+                <Text m={10}></Text>
+
             </Flex>
         </VStack>
     )
 }
 
-export default DisplayChess
+export default DisplayChess 

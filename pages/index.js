@@ -1,5 +1,10 @@
 import Head from 'next/head'
-import DisplayChess from '../components/DisplayChess';
+// import DisplayChess from '../components/DisplayChess';
+import dynamic from 'next/dynamic';
+
+const ChessGui = dynamic(() => import('../components/DisplayChess'), {
+  ssr: false
+});
 
 export default function Home() {
   return (
@@ -12,7 +17,7 @@ export default function Home() {
             content="default-src 'self' https: ; object-src 'none'" /> */}
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <DisplayChess />
+      <ChessGui />
     </div>
   )
 }
