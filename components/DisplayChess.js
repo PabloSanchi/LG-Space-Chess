@@ -97,6 +97,9 @@ function DisplayChess() {
                 'connect_timeout': 2000,
                 transports: ['websocket', 'polling', 'flashsocket'],
                 query: "mobile=true",
+                extraHeaders: {
+                    Authorization: "...",
+                },
             });
 
             // setErrorText(JSON.stringify(soc));
