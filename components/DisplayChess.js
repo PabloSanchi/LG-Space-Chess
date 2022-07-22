@@ -97,9 +97,10 @@ function DisplayChess() {
                 'connect_timeout': 2000,
                 transports: ['websocket', 'polling', 'flashsocket'],
                 query: "mobile=true",
+                withCredentials: true,
                 extraHeaders: {
-                    Authorization: "...",
-                },
+                  "my-custom-header": "abcd"
+                }
             });
 
             // setErrorText(JSON.stringify(soc));
