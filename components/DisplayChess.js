@@ -88,7 +88,6 @@ function DisplayChess() {
     const handleConnect = async () => {
         console.log('IP: ' + userDoc.data()?.lqrigip);
         setConStat('Loading...');
-        // process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
         try {
             // setErrorText(`wss://${userDoc.data()?.lqrigip}:8120`);
 
@@ -96,7 +95,7 @@ function DisplayChess() {
             soc = io(urlSoc, {
                 'reconnect': false,
                 'connect_timeout': 2000,
-                transports: ['flashsocket', 'polling', 'websocket'],
+                transports: ['websocket', 'polling', 'flashsocket'],
                 query: "mobile=true",
             });
 
@@ -363,7 +362,7 @@ function DisplayChess() {
 
                             options={{
                                 color: "green",
-                                lockX: true,
+                                // lockX: true,
                                 mode: "static",
                                 position: { top: "50%", left: "50%" }
                             }}
