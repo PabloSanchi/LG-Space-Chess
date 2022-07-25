@@ -29,9 +29,9 @@ const Header = (props) => {
     const [show, setShow] = useState(false);
     const toggleMenu = () => setShow(!show);
 
-    const { isOpen, onOpen, onClose } = useDisclosure()
-    const initialRef = useRef(null)
-    const finalRef = useRef(null)
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const initialRef = useRef(null);
+    const finalRef = useRef(null);
 
     const notify = (text) => toast(text);
 
@@ -131,10 +131,6 @@ const Header = (props) => {
                     direction={['column', 'row', 'row', 'row']}
                     pt={[4, 4, 0, 0]}
                 >
-                    {/* <MenuItem todo={() => { }} to="/about">About</MenuItem>
-                    <MenuItem todo={() => { }} to="/findsat">FindSat</MenuItem>
-                    <MenuItem toDo={onOpen}>LQRig</MenuItem>
-                    <MenuItem toDo={handleSignOut} isLast>SignOut</MenuItem> */}
 
                     <Button
                         color="orange.800"
@@ -184,23 +180,4 @@ const Header = (props) => {
     );
 };
 
-const MenuItem = ({ children, isLast, to = '/', toDo }) => {
-
-    return (
-        <Button
-            color="red.800"
-            backgroundColor="white"
-            width="100%"
-            mb={{ base: isLast ? 0 : 2, sm: 0 }}
-            mr={{ base: 0, sm: isLast ? 0 : 3 }}
-            display="block"
-            onClick={toDo}
-        >
-            <Link href={to}>{children}</Link>
-        </Button>
-    );
-};
-
-
 export default Header;
-

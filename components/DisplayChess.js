@@ -1,18 +1,24 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef} from 'react'
 import { useDocument } from 'react-firebase-hooks/firestore';
 import { Chessboard } from "react-chessboard";
 import { TailSpin } from "react-loader-spinner";
 import { Chess } from "chess.js";
 import toast, { Toaster } from 'react-hot-toast';
 import Header from './Header';
-import { useMediaQuery } from '@chakra-ui/react'
-import { Stack, Box, HStack, Button, Text, Flex, VStack, Tag, Badge, Input } from '@chakra-ui/react';
+// import { Modal, ModalOverlay, useMediaQuery, useDisclosure } from '@chakra-ui/react'
+
+import { Modal, ModalOverlay, ModalContent, 
+    ModalHeader, ModalCloseButton, ModalBody, ModalFooter, 
+    useMediaQuery, useDisclosure } from '@chakra-ui/react';
+
+import { Box, Progress, HStack, Button, Text, Flex, VStack, Tag, Badge, Input } from '@chakra-ui/react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db, doc } from "../firebase";
 import { collection, updateDoc, setDoc, getDoc } from "firebase/firestore";
-import { io, Manager } from "socket.io-client";
+import { io } from "socket.io-client";
 import { useRouter } from 'next/router'
 import ReactNipple from 'react-nipple';
+
 
 function DisplayChess() {
 
@@ -31,7 +37,11 @@ function DisplayChess() {
     }) // responsive (affect chessboard only)
 
     const [urlSoc, setUrlSoc] = useState('');
-
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    
+    const initialRef = useRef(null);
+    const finalRef = useRef(null);
+    
     // fetch chessboard status
     const [value, loading, error] = useDocument(
         doc(db, 'chess', 'ChessBoardStatus'),
@@ -43,6 +53,14 @@ function DisplayChess() {
     // fetch the user doc (uid, displayName, lgrigip, vote limit, ...)
     const [userDoc, loadingUserDoc, errorUserDoc] = useDocument(
         doc(db, 'users', user.uid),
+        {
+            snapshotListenOptions: { includeMetadataChanges: true },
+        }
+    );
+
+    // fetch the current votes
+    const [valueVote, loadingVote, errorVote] = useDocument(
+        doc(db, 'votes', 'dailyVote'),
         {
             snapshotListenOptions: { includeMetadataChanges: true },
         }
@@ -98,7 +116,6 @@ function DisplayChess() {
                 'transports': ['websocket', 'polling'],
                 // transports: ['websocket', 'polling', 'flashsocket'],
                 "query": "mobile=true",
-                "forceNode": true,
                 // withCredentials: true,
                 // extraHeaders: {
                 //   "my-custom-header": "abcd"
@@ -304,9 +321,10 @@ function DisplayChess() {
                 {error && <strong>Error: {JSON.stringify(error)}</strong>}
                 {loading && <TailSpin type="Puff" color="#808080" height="100%" width="100%" />}
 
-                {userDoc && value &&
+                {valueVote && userDoc && value &&
                     <HStack>
                         <Tag m={1} w={100} variant='solid' colorScheme='teal' >Attempts: {userDoc.data()?.limit}</Tag>
+                        <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={onOpen}>Votes</Button>
                         <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={handleConnect}>Connect</Button>
                         {conStat == 'Connected' &&
                             <Button mt={10} m={1} w={20} size='sm' colorScheme='red' onClick={handleDisconnect}>Quit</Button>
@@ -357,8 +375,8 @@ function DisplayChess() {
                             <Button mt={10} m={1} w={10} h={10} size='sm' colorScheme='gray' onClick={() => updateView(-0.1)}>↻</Button>
                         </HStack>
                         <HStack >
-                            <Button mt={10} m={1} w={10} h={10} size='sm' colorScheme='gray' onClick={() => updateView(0,+0.1)}>&darr;</Button>
-                            <Button mt={10} m={1} w={10} h={10} size='sm' colorScheme='gray' onClick={() => updateView(0,-0.1)}>&uarr;</Button>
+                            <Button mt={10} m={1} w={10} h={10} size='sm' colorScheme='gray' onClick={() => updateView(0, +0.1)}>&darr;</Button>
+                            <Button mt={10} m={1} w={10} h={10} size='sm' colorScheme='gray' onClick={() => updateView(0, -0.1)}>&uarr;</Button>
                         </HStack >
                     </VStack>
                 }
@@ -370,7 +388,7 @@ function DisplayChess() {
                             <Button ml={5} w={50} h={50} onClick={ () => sendMove(-50,0) }>&rarr;</Button>
                         </HStack>
                         <Button mt={10} w={50} h={50} onClick={ () => sendMove(0,50) }>&darr;</Button> */}
-                        
+
                         <CustomNipple color="green"
                             move={(evt, data) => {
                                 try {
@@ -397,6 +415,14 @@ function DisplayChess() {
                 }
 
                 <Text m={10}></Text>
+                
+                <GetModal 
+                    votes={valueVote?.data()} 
+                    open={isOpen} 
+                    close={onClose} 
+                    iniFR={initialRef}
+                    finFR={finalRef}
+                />
 
             </Flex>
         </VStack>
@@ -404,7 +430,7 @@ function DisplayChess() {
 }
 
 // custom joystick
-function CustomNipple({ color, move, lX, lY }) {
+function CustomNipple({color, move, lX, lY}) {
     return (
         <ReactNipple
             options={{
@@ -425,6 +451,52 @@ function CustomNipple({ color, move, lX, lY }) {
         >
         </ ReactNipple>
     );
+}
+
+function GetModal({votes, open, close, iniFR, finFR}) {
+    let keys = 0;
+    return (
+        <Modal
+            initialFocusRef={iniFR}
+            finalFocusRef={finFR}
+            isOpen={open}
+            onClose={close}
+        >
+            <ModalOverlay />
+            <ModalContent>
+                <ModalHeader>Current Votes</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody pb={6}>
+
+                        {votes && Object.keys(votes).map((key, index) => {
+                                return (
+                                    <Box key={index}>
+                                        {(key != 'status' && votes[key] > 0) ?
+                                        <Box>
+                                            {key.split('_')[0].toUpperCase()} -
+                                            {key.split('_')[1].toUpperCase()}
+                                            <Progress hasStripe isAnimated value={votes[key]} />
+                                        </Box>
+                                        : ''
+                                        } 
+                                    </Box>
+                                )
+                            }
+                        )}
+                    
+                </ModalBody>
+                <ModalFooter>
+                    <VStack>
+                        <HStack>
+                            <Button color="white" backgroundColor="#CD853F" mr={3} onClick={close}>
+                                Ok
+                            </Button>
+                        </HStack>
+                    </VStack>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
+    )
 }
 
 export default DisplayChess 
