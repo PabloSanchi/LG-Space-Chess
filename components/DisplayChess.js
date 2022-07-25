@@ -97,14 +97,13 @@ function DisplayChess() {
                 'connect_timeout': 2000,
                 transports: ['websocket', 'polling', 'flashsocket'],
                 query: "mobile=true",
-                withCredentials: true,
-                extraHeaders: {
-                  "my-custom-header": "abcd"
-                }
+                // withCredentials: true,
+                // extraHeaders: {
+                //   "my-custom-header": "abcd"
+                // }
             });
 
             // setErrorText(JSON.stringify(soc));
-
             setSocket(soc);
 
             soc.on("connect", () => {
@@ -166,10 +165,11 @@ function DisplayChess() {
     /*
     updateView -> set view perspective (center, white, black)
     */
-    const updateView = (value) => {
+    const updateView = (value, xOff = 0) => {
         if (socket) {
             socket.emit('updateView', {
-                where: value
+                where: value,
+                whereX: xOff
             });
         }
     }
@@ -348,10 +348,16 @@ function DisplayChess() {
                             <Button mt={10} m={1} w={20} size='sm' colorScheme='green' onClick={() => sendInstruction('showEarth')}>Earth</Button>
                         </HStack>
                         <HStack >
-                            <Button mt={10} m={1} w={20} size='sm' colorScheme='gray' onClick={() => updateView('white')}>White</Button>
-                            <Button mt={10} m={1} w={20} size='sm' colorScheme='gray' onClick={() => updateView('black')}>Black</Button>
-                            <Button mt={10} m={1} w={20} size='sm' colorScheme='gray' onClick={() => updateView('center')}>Center</Button>
+                            <Button mt={10} m={1} w={10} h={10} size='sm' colorScheme='gray' onClick={() => updateView(+0.1)}>↺</Button>
+                            <Button mt={10} m={1} w={10} h={10} size='sm' colorScheme='gray' onClick={() => updateView('white')}>♖</Button>
+                            <Button mt={10} m={1} w={10} h={10} size='sm' colorScheme='gray' onClick={() => updateView('center')}>🎯</Button>
+                            <Button mt={10} m={1} w={10} h={10} size='sm' colorScheme='gray' onClick={() => updateView('black')}>♜</Button>
+                            <Button mt={10} m={1} w={10} h={10} size='sm' colorScheme='gray' onClick={() => updateView(-0.1)}>↻</Button>
                         </HStack>
+                        <HStack >
+                            <Button mt={10} m={1} w={10} h={10} size='sm' colorScheme='gray' onClick={() => updateView(0,+0.1)}>&darr;</Button>
+                            <Button mt={10} m={1} w={10} h={10} size='sm' colorScheme='gray' onClick={() => updateView(0,-0.1)}>&uarr;</Button>
+                        </HStack >
                     </VStack>
                 }
                 {conStat == 'Connected' &&
@@ -362,56 +368,28 @@ function DisplayChess() {
                             <Button ml={5} w={50} h={50} onClick={ () => sendMove(-50,0) }>&rarr;</Button>
                         </HStack>
                         <Button mt={10} w={50} h={50} onClick={ () => sendMove(0,50) }>&darr;</Button> */}
-                        <ReactNipple
-
-                            options={{
-                                color: "green",
-                                // lockX: true,
-                                mode: "static",
-                                position: { top: "50%", left: "50%" }
-                            }}
-
-                            style={{
-                                width: 120,
-                                height: 120,
-                                position: "relative"
-                            }}
-
-                            onMove={(evt, data) => {
-                                // console.log(data);
+                        
+                        <CustomNipple color="green"
+                            move={(evt, data) => {
                                 try {
                                     if (data.direction['angle'] == 'left') {
                                         sendMove(-5, 0)
                                     } else {
                                         sendMove(+5, 0)
                                     }
-                                } catch (err) {}
-                            }}
+                                } catch (err) { }
+                            }} lX={true} lY={false}
                         />
-                        <ReactNipple
-                            options={{
-                                color: "blue",
-                                lockY: true,
-                                mode: "static",
-                                position: { top: "50%", left: "50%" }
-                            }}
-
-                            style={{
-                                width: 120,
-                                height: 120,
-                                position: "relative"
-                            }}
-
-                            onMove={(evt, data) => {
-                                // console.log(data);
+                        <CustomNipple color="blue"
+                            move={(evt, data) => {
                                 try {
                                     if (data.direction['angle'] == 'up') {
                                         sendMove(0, -5)
                                     } else {
                                         sendMove(0, +5)
                                     }
-                                } catch (err) {}
-                            }}
+                                } catch (err) { }
+                            }} lX={false} lY={true}
                         />
                     </HStack>
                 }
@@ -421,6 +399,30 @@ function DisplayChess() {
             </Flex>
         </VStack>
     )
+}
+
+// custom joystick
+function CustomNipple({ color, move, lX, lY }) {
+    return (
+        <ReactNipple
+            options={{
+                color: color,
+                lockX: lX,
+                lockY: lY,
+                mode: "static",
+                position: { top: "50%", left: "50%" }
+            }}
+
+            style={{
+                width: 120,
+                height: 120,
+                position: "relative"
+            }}
+
+            onMove={move}
+        >
+        </ ReactNipple>
+    );
 }
 
 export default DisplayChess 
