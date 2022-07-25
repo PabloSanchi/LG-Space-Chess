@@ -92,13 +92,12 @@ function DisplayChess() {
             // setErrorText(`wss://${userDoc.data()?.lqrigip}:8120`);
 
             // soc = io(`ws://${userDoc.data()?.lqrigip}:8120/`, {
-            soc = new Manager(urlSoc, {
+            soc = io(urlSoc, {
                 'reconnect': false,
                 'connect_timeout': 2000,
                 'transports': ['websocket', 'polling'],
                 // transports: ['websocket', 'polling', 'flashsocket'],
                 "query": "mobile=true",
-                "reconnectionAttempts": 10,
                 "forceNode": true,
                 // withCredentials: true,
                 // extraHeaders: {
