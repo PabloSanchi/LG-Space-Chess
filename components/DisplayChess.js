@@ -95,9 +95,11 @@ function DisplayChess() {
             soc = new Manager(urlSoc, {
                 'reconnect': false,
                 'connect_timeout': 2000,
-                'transports': ['websocket'],
+                'transports': ['websocket', 'polling'],
                 // transports: ['websocket', 'polling', 'flashsocket'],
-                query: "mobile=true",
+                "query": "mobile=true",
+                "reconnectionAttempts": 10,
+                "forceNode": true,
                 // withCredentials: true,
                 // extraHeaders: {
                 //   "my-custom-header": "abcd"
@@ -117,7 +119,7 @@ function DisplayChess() {
             });
 
             soc.on("connect_error", (err) => {
-                console.log(`connect_error due to ${err.message}`);
+                console.log(`connect_error due to ${err}`);
                 soc.disconnect();
                 setConStat('Fail');
             });
