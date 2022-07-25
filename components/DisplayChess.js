@@ -10,7 +10,7 @@ import { Stack, Box, HStack, Button, Text, Flex, VStack, Tag, Badge, Input } fro
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db, doc } from "../firebase";
 import { collection, updateDoc, setDoc, getDoc } from "firebase/firestore";
-import { io } from "socket.io-client";
+import { io, Manager } from "socket.io-client";
 import { useRouter } from 'next/router'
 import ReactNipple from 'react-nipple';
 
@@ -92,7 +92,7 @@ function DisplayChess() {
             // setErrorText(`wss://${userDoc.data()?.lqrigip}:8120`);
 
             // soc = io(`ws://${userDoc.data()?.lqrigip}:8120/`, {
-            soc = io(urlSoc, {
+            soc = new Manager(urlSoc, {
                 'reconnect': false,
                 'connect_timeout': 2000,
                 'transports': ['websocket'],
