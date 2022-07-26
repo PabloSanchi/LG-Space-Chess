@@ -10,7 +10,7 @@ import Header from './Header';
 import {
     Modal, ModalOverlay, ModalContent,
     ModalHeader, ModalCloseButton, ModalBody, ModalFooter,
-    useMediaQuery, useDisclosure
+    useMediaQuery, useDisclosure, Link
 } from '@chakra-ui/react';
 
 import { IconButton, Box, Progress, HStack, Button, Text, Flex, VStack, Tag, Badge, Input } from '@chakra-ui/react';
@@ -107,8 +107,11 @@ function DisplayChess() {
     handleConnect -> connect client with lgrig via WebSockets
     */
     const handleConnect = async () => {
+        
+        window.open(urlSoc, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
         console.log('IP: ' + userDoc.data()?.lqrigip);
         setConStat('Loading...');
+        
         try {
             // setErrorText(`wss://${userDoc.data()?.lqrigip}:8120`);
 
