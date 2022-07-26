@@ -108,7 +108,7 @@ function DisplayChess() {
     */
     const handleConnect = async () => {
         
-        window.open(urlSoc, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+        // window.open(urlSoc, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
         console.log('IP: ' + userDoc.data()?.lqrigip);
         setConStat('Loading...');
         
