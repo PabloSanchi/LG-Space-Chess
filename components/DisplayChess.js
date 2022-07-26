@@ -122,6 +122,9 @@ function DisplayChess() {
                 'transports': ['websocket', 'polling'],
                 // transports: ['websocket', 'polling', 'flashsocket'],
                 "query": "mobile=true",
+                extraHeaders: {
+                    "ngrok-skip-browser-warning" : true
+                }
                 // withCredentials: true,
                 // extraHeaders: {
                 //   "my-custom-header": "abcd"
