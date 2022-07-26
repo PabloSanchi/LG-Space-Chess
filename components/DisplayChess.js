@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useRef} from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { useDocument } from 'react-firebase-hooks/firestore';
 import { Chessboard } from "react-chessboard";
 import { TailSpin } from "react-loader-spinner";
@@ -7,11 +7,13 @@ import toast, { Toaster } from 'react-hot-toast';
 import Header from './Header';
 // import { Modal, ModalOverlay, useMediaQuery, useDisclosure } from '@chakra-ui/react'
 
-import { Modal, ModalOverlay, ModalContent, 
-    ModalHeader, ModalCloseButton, ModalBody, ModalFooter, 
-    useMediaQuery, useDisclosure } from '@chakra-ui/react';
+import {
+    Modal, ModalOverlay, ModalContent,
+    ModalHeader, ModalCloseButton, ModalBody, ModalFooter,
+    useMediaQuery, useDisclosure
+} from '@chakra-ui/react';
 
-import { Box, Progress, HStack, Button, Text, Flex, VStack, Tag, Badge, Input } from '@chakra-ui/react';
+import { IconButton, Box, Progress, HStack, Button, Text, Flex, VStack, Tag, Badge, Input } from '@chakra-ui/react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db, doc } from "../firebase";
 import { collection, updateDoc, setDoc, getDoc } from "firebase/firestore";
@@ -19,6 +21,7 @@ import { io } from "socket.io-client";
 import { useRouter } from 'next/router'
 import ReactNipple from 'react-nipple';
 
+import { CloseIcon } from '@chakra-ui/icons';
 
 function DisplayChess() {
 
@@ -38,10 +41,10 @@ function DisplayChess() {
 
     const [urlSoc, setUrlSoc] = useState('');
     const { isOpen, onOpen, onClose } = useDisclosure();
-    
+
     const initialRef = useRef(null);
     const finalRef = useRef(null);
-    
+
     // fetch chessboard status
     const [value, loading, error] = useDocument(
         doc(db, 'chess', 'ChessBoardStatus'),
@@ -314,6 +317,7 @@ function DisplayChess() {
     return (
         <VStack h="calc(100vh-3.5rem)" w="100vw" position="absolute">
             <Header />
+
             <Flex direction="column">
                 <Toaster />
                 <Input size="sm" focusBorderColor='blue.300s' placeholder='set input' onChange={(e) => setUrlSoc(e.target.value)} />
@@ -324,12 +328,14 @@ function DisplayChess() {
                 {valueVote && userDoc && value &&
                     <HStack>
                         <Tag m={1} w={100} variant='solid' colorScheme='teal' >Attempts: {userDoc.data()?.limit}</Tag>
-                        <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={onOpen}>Votes</Button>
+                        <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={onOpen}>Votes</Button> 
                         <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={handleConnect}>Connect</Button>
                         {conStat == 'Connected' &&
-                            <Button mt={10} m={1} w={20} size='sm' colorScheme='red' onClick={handleDisconnect}>Quit</Button>
+                            // <Button mt={10} m={1} w={20} size='sm' colorScheme='red' onClick={handleDisconnect}>Quit</Button>
+                            <IconButton colorScheme='red' size='sm' icon={<CloseIcon/>} onClick={handleDisconnect} />
                         }
                     </HStack>
+                
                 }
 
                 {userDoc && <Badge m={1} colorScheme='purple'> LGRig IP: {userDoc.data()?.lqrigip}</Badge>}
@@ -415,11 +421,12 @@ function DisplayChess() {
                 }
 
                 <Text m={10}></Text>
-                
-                <GetModal 
-                    votes={valueVote?.data()} 
-                    open={isOpen} 
-                    close={onClose} 
+
+
+                <GetModal
+                    votes={valueVote?.data()}
+                    open={isOpen}
+                    close={onClose}
                     iniFR={initialRef}
                     finFR={finalRef}
                 />
@@ -430,7 +437,7 @@ function DisplayChess() {
 }
 
 // custom joystick
-function CustomNipple({color, move, lX, lY}) {
+function CustomNipple({ color, move, lX, lY }) {
     return (
         <ReactNipple
             options={{
@@ -453,7 +460,7 @@ function CustomNipple({color, move, lX, lY}) {
     );
 }
 
-function GetModal({votes, open, close, iniFR, finFR}) {
+function GetModal({ votes, open, close, iniFR, finFR }) {
     let keys = 0;
     return (
         <Modal
@@ -468,22 +475,22 @@ function GetModal({votes, open, close, iniFR, finFR}) {
                 <ModalCloseButton />
                 <ModalBody pb={6}>
 
-                        {votes && Object.keys(votes).map((key, index) => {
-                                return (
-                                    <Box key={index}>
-                                        {(key != 'status' && votes[key] > 0) ?
-                                        <Box>
-                                            {key.split('_')[0].toUpperCase()} -
-                                            {key.split('_')[1].toUpperCase()}
-                                            <Progress hasStripe isAnimated value={votes[key]} />
-                                        </Box>
-                                        : ''
-                                        } 
+                    {votes && Object.keys(votes).map((key, index) => {
+                        return (
+                            <Box key={index}>
+                                {(key != 'status' && votes[key] > 0) ?
+                                    <Box>
+                                        {key.split('_')[0].toUpperCase()} -
+                                        {key.split('_')[1].toUpperCase()}
+                                        <Progress hasStripe isAnimated value={votes[key]} />
                                     </Box>
-                                )
-                            }
-                        )}
-                    
+                                    : ''
+                                }
+                            </Box>
+                        )
+                    }
+                    )}
+
                 </ModalBody>
                 <ModalFooter>
                     <VStack>
