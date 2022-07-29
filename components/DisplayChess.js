@@ -114,7 +114,7 @@ function DisplayChess() {
             if(userDoc.data()?.lqrigip != '') {
                 const docRef = doc(db, 'rig', userDoc.data()?.lqrigip);
                 const docSnap = await getDoc(docRef);
-                if(docSnap.exists()) ipAux = docSnap.data()?.ip[0] ?? urlSoc;
+                if(docSnap.exists()) ipAux = docSnap.data()?.ip ?? urlSoc;
             }
 
             console.log('Connecting to: ', ipAux);
