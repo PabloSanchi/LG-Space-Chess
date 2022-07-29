@@ -111,7 +111,7 @@ function DisplayChess() {
 
         try {
             var ipAux = urlSoc;
-            if(urlSoc != '' && userDoc.data()?.lqrigip != '') {
+            if(urlSoc == '' && userDoc.data()?.lqrigip != '') {
                 const docRef = doc(db, 'rig', userDoc.data()?.lqrigip);
                 const docSnap = await getDoc(docRef);
                 if(docSnap.exists()) ipAux = docSnap.data()?.ip ?? urlSoc;
