@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
-import { useDocument } from 'react-firebase-hooks/firestore';
+import { useDocument, useCollection } from 'react-firebase-hooks/firestore';
 import { Chessboard } from "react-chessboard";
 import { TailSpin } from "react-loader-spinner";
 import { Chess } from "chess.js";
@@ -27,7 +27,6 @@ function DisplayChess() {
 
     // variable definition
     let soc = 'null';
-    let [errorText, setErrorText] = useState('');
     const router = useRouter();
     const [socket, setSocket] = useState(null);
     const [conStat, setConStat] = useState('Disconnected');
@@ -55,7 +54,7 @@ function DisplayChess() {
 
     // fetch the user doc (uid, displayName, lgrigip, vote limit, ...)
     const [userDoc, loadingUserDoc, errorUserDoc] = useDocument(
-        doc(db, 'users', user.uid),
+        doc(db, 'users', user?.uid),
         {
             snapshotListenOptions: { includeMetadataChanges: true },
         }
@@ -107,23 +106,27 @@ function DisplayChess() {
     handleConnect -> connect client with lgrig via WebSockets
     */
     const handleConnect = async () => {
-        
-        // window.open(urlSoc, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
         console.log('IP: ' + userDoc.data()?.lqrigip);
         setConStat('Loading...');
-        
-        try {
-            // setErrorText(`wss://${userDoc.data()?.lqrigip}:8120`);
 
-            // soc = io(`ws://${userDoc.data()?.lqrigip}:8120/`, {
-            soc = io(urlSoc, {
+        try {
+            var ipAux = urlSoc;
+            if(userDoc.data()?.lqrigip != '') {
+                const docRef = doc(db, 'rig', userDoc.data()?.lqrigip);
+                const docSnap = await getDoc(docRef);
+                if(docSnap.exists()) ipAux = docSnap.data()?.ip[0] ?? urlSoc;
+            }
+
+            console.log('Connecting to: ', ipAux);
+
+            soc = io(ipAux, {
                 'reconnect': false,
                 'connect_timeout': 2000,
                 'transports': ['websocket', 'polling'],
                 // transports: ['websocket', 'polling', 'flashsocket'],
                 "query": "mobile=true",
                 extraHeaders: {
-                    "ngrok-skip-browser-warning" : true
+                    "ngrok-skip-browser-warning": true
                 }
                 // withCredentials: true,
                 // extraHeaders: {
@@ -155,6 +158,9 @@ function DisplayChess() {
         }
     }
 
+    /*
+    handleDisconnect -> disconnect client from lgrig
+    */
     const handleDisconnect = async () => {
         if (socket) {
             socket.emit('quit');
@@ -326,22 +332,21 @@ function DisplayChess() {
 
             <Flex direction="column">
                 <Toaster />
-                <Input size="sm" focusBorderColor='blue.300s' placeholder='set input' onChange={(e) => setUrlSoc(e.target.value)} />
-                <Text>{urlSoc}</Text>
+                <Input size="sm" focusBorderColor='blue.300s' placeholder='Enter url' onChange={(e) => setUrlSoc(e.target.value)} />
                 {error && <strong>Error: {JSON.stringify(error)}</strong>}
                 {loading && <TailSpin type="Puff" color="#808080" height="100%" width="100%" />}
 
                 {valueVote && userDoc && value &&
                     <HStack>
                         <Tag m={1} w={100} variant='solid' colorScheme='teal' >Attempts: {userDoc.data()?.limit}</Tag>
-                        <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={onOpen}>Votes</Button> 
+                        <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={onOpen}>Votes</Button>
                         <Button mt={10} m={1} w={20} size='sm' colorScheme='blue' onClick={handleConnect}>Connect</Button>
                         {conStat == 'Connected' &&
                             // <Button mt={10} m={1} w={20} size='sm' colorScheme='red' onClick={handleDisconnect}>Quit</Button>
-                            <IconButton colorScheme='red' size='sm' icon={<CloseIcon/>} onClick={handleDisconnect} />
+                            <IconButton colorScheme='red' size='sm' icon={<CloseIcon />} onClick={handleDisconnect} />
                         }
                     </HStack>
-                
+
                 }
 
                 {userDoc && <Badge m={1} colorScheme='purple'> LGRig IP: {userDoc.data()?.lqrigip}</Badge>}

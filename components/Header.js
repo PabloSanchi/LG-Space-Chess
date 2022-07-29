@@ -132,7 +132,7 @@ const Header = (props) => {
                     pt={[4, 4, 0, 0]}
                 >
 
-                    <Button
+                    {/* <Button
                         color="orange.800"
                         backgroundColor="white"
                         width="100%"
@@ -140,9 +140,9 @@ const Header = (props) => {
                         mr={{ base: 0, sm: 3 }}
                         display="block"
                         onClick={() => { router.push('/about') }}
-                    >About</Button>
-
-                    <Button
+                    >About</Button> */}
+                    <CustomButton mbVal={2} mrVal={3} foo={() => { router.push('/about') }} name="About" />
+                    {/* <Button
                         color="orange.800"
                         backgroundColor="white"
                         width="100%"
@@ -150,9 +150,10 @@ const Header = (props) => {
                         mr={{ base: 0, sm: 3 }}
                         display="block"
                         onClick={() => { router.push('/findsat') }}
-                    >FindSat</Button>
+                    >FindSat</Button> */}
 
-                    <Button
+                    <CustomButton mbVal={2} mrVal={3} foo={() => { router.push('/findsat') }} name="FindSat" />
+                    {/* <Button
                         color="orange.800"
                         backgroundColor="white"
                         width="100%"
@@ -160,9 +161,11 @@ const Header = (props) => {
                         mr={{ base: 0, sm: 3 }}
                         display="block"
                         onClick={onOpen}
-                    >LGRig</Button>
+                    >LGRig</Button> */}
 
-                    <Button
+                    <CustomButton mbVal={2} mrVal={3} foo={onOpen} name="LGRig" />
+
+                    {/* <Button
                         color="orange.800"
                         backgroundColor="white"
                         width="100%"
@@ -170,8 +173,9 @@ const Header = (props) => {
                         mr={{ base: 0, sm: 0 }}
                         display="block"
                         onClick={handleSignOut}
-                    >SignOut</Button>
+                    >SignOut</Button> */}
 
+                    <CustomButton mbVal={0} mrVal={0} foo={handleSignOut} name="SignOut" />
                 </Flex>
             </Box>
 
@@ -179,5 +183,20 @@ const Header = (props) => {
         </Flex>
     );
 };
+
+function CustomButton({ mbVal, mrVal, foo, name}) {
+    return (
+        <Button
+            color="orange.800"
+            backgroundColor="white"
+            width="100%"
+            mb = {{ base: mbVal, sm: 0 }}
+            mr = {{ base: 0, sm: mrVal }}
+            display="block"
+            onClick={foo}
+        >{name}
+        </Button>
+    )
+}
 
 export default Header;
